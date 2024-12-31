@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger text-red-500 bg-red-100 border border-red-300 rounded-lg p-4 my-4">
+            {{ flash_error }}
+        </div>
+    {% endfor %}
+
+    <h1 class="text-3xl font-semibold mb-6">Register</h1>
+
+    {{ form_errors(registrationForm) }}
+
+    <form action="{{ path('app_register') }}" method="POST" class="space-y-4">
+        {{ form_row(registrationForm.email, {
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+        {{ form_row(registrationForm.username, {
+            'label': 'Username',
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+        {{ form_row(registrationForm.plainPassword, {
+            'label': 'Password',
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+        {{ form_row(registrationForm.agreeTerms, {
+            'attr': {
+                'class': 'inline-block text-sm text-gray-700'
+            }
+        }) }}
+
+        <!-- Manually include the CSRF token -->
+        {{ form_row(registrationForm._token) }}
+
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Register
+        </button>
+    </form>
+</div>
+{% endblock %}

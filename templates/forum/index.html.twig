@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TalkSphere - Home{% endblock %}
+
+{% block body %}
+<div class="py-10">
+    <h1 class="text-4xl font-bold text-center text-gray-800">Welcome to TalkSphere</h1>
+
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for category in categories %}
+            <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg">
+                <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-800">{{ category.name }}</h2>
+                <p class="font-normal text-gray-600">{{ category.description }}</p>
+                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mt-4">
+                    View Topics
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

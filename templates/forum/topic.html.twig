@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Topic: {{ topic.title }}{% endblock %}
+
+{% block body %}
+    <h1>{{ topic.title }}</h1>
+    <p>{{ topic.content }}</p>
+    <p>By {{ topic.author.username }} | {{ topic.createdAt|date('Y-m-d H:i') }}</p>
+
+    <h2>Posts</h2>
+    {% for post in topic.posts %}
+        <div>
+            <p>{{ post.content }}</p>
+            <p>By {{ post.author.username }} | {{ post.createdAt|date('Y-m-d H:i') }}</p>
+        </div>
+    {% endfor %}
+
+    {% if is_granted('ROLE_USER') %}
+        {{ form_start(postForm) }}
+            {{ form_widget(postForm) }}
+            <button type="submit" class="btn">Add Post</button>
+        {{ form_end(postForm) }}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ category.name }} - Topics{% endblock %}
+
+{% block body %}
+    <h1 class="text-center my-4">{{ category.name }}</h1>
+
+    <div class="list-group">
+        {% for topic in category.topics %}
+            <a href="{{ path('app_topic_show', {'id': topic.id}) }}" class="list-group-item list-group-item-action">
+                {{ topic.title }} <span class="badge bg-secondary float-end">{{ topic.posts|length }} Posts</span>
+            </a>
+        {% else %}
+            <p class="text-muted">No topics in this category yet.</p>
+        {% endfor %}
+    </div>
+
+    {% if is_granted('ROLE_USER') %}
+        <div class="text-center mt-3">
+            <a href="{{ path('app_topic_new') }}" class="btn btn-success">Create New Topic</a>
+        </div>
+    {% endif %}
+{% endblock %}
