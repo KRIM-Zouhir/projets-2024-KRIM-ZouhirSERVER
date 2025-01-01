@@ -14,6 +14,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class RegistrationController extends AbstractController
 {
@@ -41,14 +42,14 @@ class RegistrationController extends AbstractController
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
-                    ->from(new Address('micmjad@gmail.com', 'TalkSphere'))
+                    ->from(new Address('micmjad@gmail.com', 'TalkSphere')/*new Address('micmjad@gmail.com', 'TalkSphere')*/)
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('app_forum_index');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('Registration/register.html.twig', [

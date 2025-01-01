@@ -1,0 +1,20 @@
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="{{ path('app_home') }}" class="navbar-logo">TalkSphere</a>
+        <div class="navbar-links">
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_profile') }}" class="navbar-link"> 
+                    {% set profilePicture = app.user.profilePicture %}
+                    <img src="{{ user.profilePicture ? asset('uploads/profile_pictures/' ~ user.profilePicture) : asset('images/default-profile.png') }}" 
+                            alt="Profile Picture" 
+                            class="navbar-profile-img"> 
+                    <span>{{ app.user.username }}</span> 
+                </a>
+                <a href="{{ path('app_logout') }}" class="navbar-link">Logout</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="navbar-link">Login</a>
+                <a href="{{ path('app_register') }}" class="navbar-link">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

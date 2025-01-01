@@ -15,7 +15,26 @@
 
     {{ form_errors(registrationForm) }}
 
-    <form action="{{ path('app_register') }}" method="POST" class="space-y-4">
+    <form action="{{ path('app_register') }}" method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        {{ form_row(registrationForm.firstname, {
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+        {{ form_row(registrationForm.lastname, {
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+        {{ form_row(registrationForm.birthdate, {
+            'attr': {
+                'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            }
+        }) }}
+
+
         {{ form_row(registrationForm.email, {
             'attr': {
                 'class': 'w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -45,7 +64,7 @@
         <!-- Manually include the CSRF token -->
         {{ form_row(registrationForm._token) }}
 
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded">
             Register
         </button>
     </form>

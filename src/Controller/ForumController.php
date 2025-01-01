@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ForumController extends AbstractController
 {
-    #[Route('/', name: 'app_forum_index')]
+    #[Route('/', name: 'app_home')]
     public function index(EntityManagerInterface $entityManager): Response
     {
         $categories = $entityManager->getRepository(Category::class)->findAll();
