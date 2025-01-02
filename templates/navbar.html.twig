@@ -4,11 +4,12 @@
         <div class="navbar-links">
             {% if is_granted('ROLE_USER') %}
                 <a href="{{ path('app_profile') }}" class="navbar-link"> 
-                    {% set profilePicture = app.user.profilePicture %}
-                    <img src="{{ user.profilePicture ? asset('uploads/profile_pictures/' ~ user.profilePicture) : asset('images/default-profile.png') }}" 
-                            alt="Profile Picture" 
-                            class="navbar-profile-img"> 
-                    <span>{{ app.user.username }}</span> 
+            <img 
+                src="{{ user.profilePicture ? asset('uploads/profile_pictures/' ~ user.profilePicture) : asset('images/default-profile.png') }}" 
+                alt="Profile Picture" 
+                class="navbar-profile-img"
+                onerror="this.src='{{ asset('images/default-profile.png') }}';"
+            />
                 </a>
                 <a href="{{ path('app_logout') }}" class="navbar-link">Logout</a>
             {% else %}

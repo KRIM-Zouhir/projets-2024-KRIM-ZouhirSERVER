@@ -9,21 +9,22 @@
 
 <div>
     <h3>Profile Picture</h3>
-    <img 
-        src="{{ user.profilePicture ? asset('uploads/profile_pictures/' ~ user.profilePicture) : asset('images/default-profile.png') }}" 
-        alt="Profile Picture" 
+    <img src="{{ app.user.getProfilePicture() }}" alt="Profile Picture"
         style="max-width: 150px; border-radius: 50%;">
 </div>
 
+<!-- Form for uploading profile picture -->
 <form method="post" enctype="multipart/form-data">
     <div>
-        <label for="profile_picture">Upload New Profile Picture:</label>
+        <label for="profile_picture">Edit Picture:</label>
         <input type="file" name="profile_picture" id="profile_picture" accept="image/jpeg,image/png">
     </div>
-    <form method="post" action="{{ path('app_remove_profile_picture') }}">
-    <button type="submit" class="btn btn-danger">Remove Profile Picture</button>
-</form>
     <button type="submit">Upload Picture</button>
+</form>
+
+<!-- Form for removing profile picture -->
+<form method="post" action="{{ path('app_remove_profile_picture') }}">
+    <button type="submit" class="btn btn-danger">Remove Profile Picture</button>
 </form>
 
 <form method="post">

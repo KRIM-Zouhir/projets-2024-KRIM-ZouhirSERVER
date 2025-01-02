@@ -27,6 +27,7 @@ security:
                 default_target_path: app_home # Redirect to home page on successful login
                 username_parameter: _username
                 password_parameter: _password
+                provider: app_user_provider
                 failure_path: app_login # Redirect to login page on failure
             logout:
                 path: app_logout

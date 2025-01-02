@@ -22,11 +22,11 @@ class ProfileController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
+         /** @var User $user */
+    $user = $this->getUser();
 
-        $errors = [];
-        $form = $this->createFormBuilder()
+    $errors = [];
+    $form = $this->createFormBuilder()
             ->add('profile_picture', FileType::class, [
                 'label' => 'Profile Picture (JPEG/PNG)',
                 'required' => false,
@@ -37,34 +37,42 @@ class ProfileController extends AbstractController
             ->getForm();
 
         $form->handleRequest($request);
+    // Handle file upload
+    if ($request->isMethod('POST') && $request->files->get('profile_picture')) {
+        /** @var UploadedFile $file */
+        $file = $request->files->get('profile_picture');
 
-        // Handle profile picture upload
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $file */
-            $file = $form->get('profile_picture')->getData();
-
-            if ($file) {
+        if ($file) {
+            // Validate file type and size if necessary
+            if (!in_array($file->guessExtension(), ['jpg', 'jpeg', 'png'])) {
+                $errors[] = 'Invalid file type. Only JPG, JPEG, and PNG are allowed.';
+            } elseif ($file->getSize() > 5 * 1024 * 1024) { // 5MB limit
+                $errors[] = 'File size exceeds 5MB.';
+            } else {
                 // Generate a unique file name
                 $fileName = uniqid() . '.' . $file->guessExtension();
 
-                // Move the file to the uploads directory
                 try {
+                    // Move the file to the uploads directory
                     $file->move(
                         $this->getParameter('profile_pictures_directory'),
                         $fileName
                     );
 
-                    // Update the user's profile picture
+                    // Update user's profile picture
                     $user->setProfilePicture($fileName);
                     $entityManager->flush();
+
                     $this->addFlash('success', 'Profile picture uploaded successfully.');
                     return $this->redirectToRoute('app_profile');
                 } catch (\Exception $e) {
-                    $errors[] = 'An error occurred while uploading the profile picture.';
-                    $this->addFlash('error', 'An error occurred while uploading the profile picture.');
+                    $errors[] = 'An error occurred while uploading the file.';
                 }
             }
+        } else {
+            $errors[] = 'No file was uploaded.';
         }
+    }
 
         // Handle other profile updates (username, email, password)
         if ($request->isMethod('POST')) {
@@ -124,8 +132,8 @@ class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        // Remove the current profile picture
-        if ($user->getProfilePicture() && $user->getProfilePicture() !== 'default-profile.png') {
+        // Remove the current profile picture if it's not the default one
+        if ($user->getProfilePicture() !== '/images/default-profile.png') {
             $profilePicturesDirectory = $this->getParameter('profile_pictures_directory');
             $filePath = $profilePicturesDirectory . '/' . $user->getProfilePicture();
 
@@ -135,10 +143,12 @@ class ProfileController extends AbstractController
         }
 
         // Set the profile picture to the default one
-        $user->setProfilePicture('default-profile.png');
+        $user->setProfilePicture('default-profile.png'); 
         $entityManager->flush();
 
         $this->addFlash('success', 'Profile picture removed successfully.');
         return $this->redirectToRoute('app_profile');
     }
+
+    
 }

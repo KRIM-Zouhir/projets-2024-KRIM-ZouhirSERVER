@@ -24,6 +24,10 @@ app_forgot_password:
     path: /forgot-password
     controller: App\Controller\ForgotController::request
 
+app_forgot_password_reset:
+    path: /reset-password/{token}
+    controller: App\Controller\ForgotController::reset
+
 app_profile:
     path: /profile
     controller: App\Controller\ProfileController::profile
