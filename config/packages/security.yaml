@@ -1,17 +1,11 @@
 security:
-    # Define how passwords are hashed
     password_hashers:
         App\Entity\User:
             algorithm: auto
 
     providers:
         app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email # Change to "username" if needed
-
-        in_memory:
-            memory: ~
+            id: App\Security\UserProvider
 
     firewalls:
         dev:
@@ -19,19 +13,15 @@ security:
             security: false
 
         main:
-            lazy: true # Replace "anonymous: lazy" with "lazy: true"
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
+            user_checker: App\Security\UserChecker
+            lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                default_target_path: app_home # Redirect to home page on successful login
-                username_parameter: _username
-                password_parameter: _password
-                provider: app_user_provider
-                failure_path: app_login # Redirect to login page on failure
+            entry_point: App\Security\LoginFormAuthenticator
             logout:
                 path: app_logout
-                target: app_home # Redirect on logout
+                target: app_home
 
     access_control:
         - { path: ^/profile, roles: ROLE_USER }
@@ -44,4 +34,3 @@ when@test:
                 cost: 4
                 time_cost: 3
                 memory_cost: 10
-    

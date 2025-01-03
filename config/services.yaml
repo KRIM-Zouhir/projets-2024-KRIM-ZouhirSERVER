@@ -8,9 +8,12 @@ parameters:
 
 services:
     # Automatically injects dependencies in your services.
+    App\Security\LoginFormAuthenticator:
+        autowire: true
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
 
     # Make classes in the src/ folder available as services
     # this creates a service per class whose id is the fully-qualified class name

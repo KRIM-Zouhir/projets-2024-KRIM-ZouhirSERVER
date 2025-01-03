@@ -52,10 +52,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $profilePicture = null;
 
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $createdAt;
+
     public function __construct()
     {
         $this->topics = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->setProfilePicture('default-profile.png');
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -152,6 +157,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getProfilePicture(): ?string
+    {
+    if ($this->profilePicture === 'default-profile.png') {
+        // Path for the default profile picture
+        return '/images/default-profile.png';
+    }
+
+    // Path for user-uploaded profile pictures
+    return '/uploads/profile_pictures/' . $this->profilePicture;
+    }
+
+    
+    public function setProfilePicture(?string $profilePicture): self
+    {
+        $this->profilePicture = $profilePicture;
+        return $this;
+    }
+
+    public function getIsVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Topic>
      */
@@ -210,32 +257,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getProfilePicture(): ?string
-    {
-    if ($this->profilePicture === 'default-profile.png') {
-        // Path for the default profile picture
-        return '/images/default-profile.png';
-    }
 
-    // Path for user-uploaded profile pictures
-    return '/uploads/profile_pictures/' . $this->profilePicture;
-    }
-
-    
-    public function setProfilePicture(?string $profilePicture): self
-    {
-        $this->profilePicture = $profilePicture;
-        return $this;
-    }
-
-    public function getIsVerified(): bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setIsVerified(bool $isVerified): self
-    {
-        $this->isVerified = $isVerified;
-        return $this;
-    }
 }

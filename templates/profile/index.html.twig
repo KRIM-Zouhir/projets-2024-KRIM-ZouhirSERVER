@@ -1,53 +1,88 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>My Profile</h1>
+    <div class="profile-container">
+        <h1 class="profile-title">My Profile</h1>
 
-{% for error in errors %}
-    <div class="alert alert-danger">{{ error }}</div>
-{% endfor %}
+        {% for error in errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
 
-<div>
-    <h3>Profile Picture</h3>
-    <img src="{{ app.user.getProfilePicture() }}" alt="Profile Picture"
-        style="max-width: 150px; border-radius: 50%;">
-</div>
+        <div class="profile-section">
+            <div class="profile-picture">
+                <img src="{{ app.user.getProfilePicture() }}" alt="Profile Picture">
+            </div>
 
-<!-- Form for uploading profile picture -->
-<form method="post" enctype="multipart/form-data">
-    <div>
-        <label for="profile_picture">Edit Picture:</label>
-        <input type="file" name="profile_picture" id="profile_picture" accept="image/jpeg,image/png">
+            <div class="navbar-search">
+                <form action="{{ path('app_search') }}" method="get">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        name="q" 
+                        placeholder="Search topics..." 
+                        aria-label="Search"
+                    >
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+            </div>
+            
+            <!-- Form for uploading profile picture -->
+            <form method="post" enctype="multipart/form-data" class="profile-form">
+                <div class="form-group">
+                    <label for="profile_picture">Edit Picture:</label>
+                    <input type="file" name="profile_picture" id="profile_picture" accept="image/jpeg,image/png">
+                </div>
+            <div class="two-btn">
+                <button type="submit" class="btn-upload">Upload Picture</button>
+                <form method="post" action="{{ path('app_remove_profile_picture') }}">
+                    <button type="submit" class="btn-remove">Remove Profile Picture</button>
+                </form>
+            </form>
+            </div>
+            <!-- Form for removing profile picture -->
+            
+        </div>
+
+        <div class="profile-section">
+            <h3 class="section-title">Update Profile</h3>
+
+            <form method="post" class="profile-form">
+
+                <div class="form-group">
+                    <label for="Firstname">First Name:</label>
+                    <input type="text" name="firstname" id="firstname" value="{{ user.firstname }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Last Name:</label>
+                    <input type="text" name="lastname" id="lastname" value="{{ user.lastname }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" id="username" value="{{ user.username }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email" value="{{ user.email }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Current Password:</label>
+                    <input type="password" name="password" id="password">
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">New Password:</label>
+                    <input type="password" name="newPassword" id="newPassword">
+                </div>
+
+                <button type="submit" class="btn-submit">Update Profile</button>
+            </form>
+        </div>
     </div>
-    <button type="submit">Upload Picture</button>
-</form>
 
-<!-- Form for removing profile picture -->
-<form method="post" action="{{ path('app_remove_profile_picture') }}">
-    <button type="submit" class="btn btn-danger">Remove Profile Picture</button>
-</form>
-
-<form method="post">
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" value="{{ user.username }}" required>
-    </div>
-
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" value="{{ user.email }}" required>
-    </div>
-
-    <div>
-        <label for="password">Current Password:</label>
-        <input type="password" name="password" id="password">
-    </div>
-
-    <div>
-        <label for="newPassword">New Password:</label>
-        <input type="password" name="newPassword" id="newPassword">
-    </div>
-
-    <button type="submit">Update Profile</button>
-</form>
+    <link rel="stylesheet" href="{{ asset('styles/profile.css') }}">
+    <script src="{{ asset('js/profile.js') }}"></script>
 {% endblock %}

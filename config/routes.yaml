@@ -20,6 +20,15 @@ app_verify_email:
     path: /verify/email
     controller: App\Controller\RegistrationController::verifyUserEmail
 
+app_confirmation_email:
+    path: /confirmation-email
+    controller: App\Controller\RegistrationController::confirmationEmail
+
+
+app_confirmation_email_success:
+    path: /confirmation-success
+    controller: App\Controller\RegistrationController::confirmationSuccess
+
 app_forgot_password:
     path: /forgot-password
     controller: App\Controller\ForgotController::request
@@ -32,6 +41,9 @@ app_profile:
     path: /profile
     controller: App\Controller\ProfileController::profile
 
+app_remove_profile_picture:
+    path: /profile/remove-picture
+    controller: App\Controller\ProfileController::removeProfilePicture
 app_category_show:
     path: /category/{id}
     controller: App\Controller\ForumController::showCategory
