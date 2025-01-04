@@ -14,6 +14,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge as HttpUserBadge;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+
+
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -40,7 +45,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         ];
 
         if (empty($credentials['username'])) {
-            throw new \InvalidArgumentException('Email/Username is required.');
+            throw new \InvalidArgumentException('Email/User is required.');
         }
 
         // Determine if the value is an email or username
@@ -65,10 +70,24 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         return new RedirectResponse($this->router->generate('app_profile'));
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): RedirectResponse
     {
-        $request->getSession()->set(Security::LAST_USERNAME, $request->request->get('email'));
+        $emailOrUsername = $request->request->get('_username');
+
+        // Default error message
+        $errorMessage = 'Invalid username/email or password.';
+
+        // Check the specific error
+        if ($exception instanceof UserNotFoundException) {
+            $errorMessage = 'The username/email you entered does not exist.';
+        } elseif ($exception instanceof BadCredentialsException) {
+            $errorMessage = 'The password is incorrect.';
+        }
+
+        // Store the error message in the session
+        $request->getSession()->set('login_error_message', $errorMessage);
 
         return new RedirectResponse($this->router->generate('app_login'));
     }
+
 }

@@ -77,7 +77,8 @@ class ProfileController extends AbstractController
         // Handle other profile updates (username, email, password)
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
-            
+            $existingUser = null;
+
             // Update firstname
             if (!empty($data['firstname'])) {
                 $existingUser = $entityManager->getRepository(User::class)->findOneBy(['firstname' => $data['firstname']]);

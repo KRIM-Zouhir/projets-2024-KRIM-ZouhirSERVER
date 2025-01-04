@@ -13,18 +13,6 @@
                 <img src="{{ app.user.getProfilePicture() }}" alt="Profile Picture">
             </div>
 
-            <div class="navbar-search">
-                <form action="{{ path('app_search') }}" method="get">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        name="q" 
-                        placeholder="Search topics..." 
-                        aria-label="Search"
-                    >
-                    <button type="submit" class="search-btn">Search</button>
-                </form>
-            </div>
             
             <!-- Form for uploading profile picture -->
             <form method="post" enctype="multipart/form-data" class="profile-form">
@@ -34,13 +22,13 @@
                 </div>
             <div class="two-btn">
                 <button type="submit" class="btn-upload">Upload Picture</button>
+
+                
                 <form method="post" action="{{ path('app_remove_profile_picture') }}">
                     <button type="submit" class="btn-remove">Remove Profile Picture</button>
                 </form>
             </form>
             </div>
-            <!-- Form for removing profile picture -->
-            
         </div>
 
         <div class="profile-section">

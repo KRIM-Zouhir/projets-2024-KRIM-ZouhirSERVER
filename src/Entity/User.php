@@ -55,6 +55,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "datetime")]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $passwordResetTokenExpiresAt = null;
+
+    
+
     public function __construct()
     {
         $this->topics = new ArrayCollection();
@@ -199,6 +207,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): self
+    {
+        $this->passwordResetToken = $passwordResetToken;
+        return $this;
+    }
+
+    public function getPasswordResetTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->passwordResetTokenExpiresAt;
+    }
+
+    public function setPasswordResetTokenExpiresAt(?\DateTimeInterface $passwordResetTokenExpiresAt): self
+    {
+        $this->passwordResetTokenExpiresAt = $passwordResetTokenExpiresAt;
+        return $this;
+    }
+    
     /**
      * @return Collection<int, Topic>
      */

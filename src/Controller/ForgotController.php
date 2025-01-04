@@ -17,11 +17,13 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use App\Service\PasswordResetService;
 
 class ForgotController extends AbstractController
 {
 
-    public function request(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, MailerInterface $mailer): Response
+    public function request(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, MailerInterface $mailer,         EntityManagerInterface $entityManager  // Add this parameter
+    ): Response
     {
         $form = $this->createForm(ForgotPasswordRequestFormType::class);
         $form->handleRequest($request);
@@ -37,7 +39,7 @@ class ForgotController extends AbstractController
                 $token = $tokenGenerator->generateToken();
                 $user->setPasswordResetToken($token);
                 $user->setPasswordResetTokenExpiresAt(new \DateTime('+1 hour')); // Le token expire dans 1 heure
-                $this->getDoctrine()->getManager()->flush();
+                $entityManager->flush();
 
                 // Envoi de l'email avec le lien de réinitialisation
                 $resetPasswordUrl = $this->generateUrl('app_reset_password', ['token' => $token], 0);
@@ -68,7 +70,6 @@ class ForgotController extends AbstractController
         ]);
     }
 
-    #[Route('/reset-password/{token}', name: 'app_forgot_password_reset')]
     public function reset(string $token, Request $request, PasswordResetService $passwordResetService): Response
     {
         // Verifier la validité du token

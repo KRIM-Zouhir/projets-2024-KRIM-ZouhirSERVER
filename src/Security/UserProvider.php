@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+
 class UserProvider implements UserProviderInterface
 {
     private EntityManagerInterface $entityManager;
@@ -25,7 +26,7 @@ class UserProvider implements UserProviderInterface
             ->findOneBy(['username' => $identifier]);
 
         if (!$user) {
-            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $identifier));
+            throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
         }
 
         return $user;

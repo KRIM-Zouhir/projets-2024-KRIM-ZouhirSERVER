@@ -16,6 +16,10 @@ app_register:
     path: /register
     controller: App\Controller\RegistrationController::register
 
+app_logout: 
+    path: /logout
+    controller: App\Controller\RegistrationController::logout
+
 app_verify_email:
     path: /verify/email
     controller: App\Controller\RegistrationController::verifyUserEmail
@@ -33,7 +37,7 @@ app_forgot_password:
     path: /forgot-password
     controller: App\Controller\ForgotController::request
 
-app_forgot_password_reset:
+app_reset_password:
     path: /reset-password/{token}
     controller: App\Controller\ForgotController::reset
 
@@ -44,6 +48,7 @@ app_profile:
 app_remove_profile_picture:
     path: /profile/remove-picture
     controller: App\Controller\ProfileController::removeProfilePicture
+    
 app_category_show:
     path: /category/{id}
     controller: App\Controller\ForumController::showCategory

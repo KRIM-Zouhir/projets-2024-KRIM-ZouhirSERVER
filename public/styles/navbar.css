@@ -2,97 +2,156 @@
 .navbar {
     background-color: #333;
     color: #fff;
-    padding: 10px 20px;
+    padding: 15px 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
-/* Logo */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Logo/Title Section (Left Corner) */
 .navbar-logo {
     font-size: 24px;
     font-weight: bold;
     text-decoration: none;
     color: #fff;
+    position: absolute;
+    left: 30px;
 }
 
 .navbar-logo:hover {
-    color: #007bff;
+    color: #2b2b2b;
 }
 
-/* Search Bar */
+/* Modern Search Bar (Center) */
 .navbar-search {
-    flex: 1;
-    max-width: 500px;
-    margin: 0 20px;
-    display: flex;
-    justify-content: center;
+    margin: 0 auto;
+    width: 40%;
+    max-width: 600px;
 }
 
 .navbar-search form {
     display: flex;
     align-items: center;
-    background-color: #444;
-    border-radius: 5px;
-    padding: 5px 10px;
-    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.navbar-search form:focus-within {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .search-input {
-    flex: 1;
-    padding: 8px 10px;
+    width: 100%;
+    padding: 10px 20px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
-    background-color: #555;
-    color: #fff;
+    border-radius: 50px;
+    background: transparent;
 }
 
 .search-input::placeholder {
-    color: #aaa;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .search-input:focus {
     outline: none;
-    background-color: #666;
 }
 
 .search-btn {
-    padding: 8px 15px;
-    background-color: #007bff;
+    color: #000000;
+    padding: 8px 20px;
+    background-color: #ffffff;
     border: none;
-    border-radius: 5px;
-    color: #fff;
+    border-radius: 50px;
     font-size: 16px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
 }
 
 .search-btn:hover {
-    background-color: #0056b3;
+    background-color: #2b2b2b;
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-/* User Profile Section */
-.navbar-profile {
+/* User Section (Right Corner) */
+.navbar-links {
     display: flex;
     align-items: center;
-    gap: 10px;
+    position: absolute;
+    right: 30px;
+    gap: 15px;
+}
+
+.navbar-link {
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-link:hover {
+    color: #545454;
 }
 
 .navbar-profile-img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     object-fit: cover;
+    transition: all 0.3s ease;
 }
 
-.navbar-username {
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
+.navbar-profile-img:hover {
+    border-color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Hide dropdown menu by default */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    border-radius: 5px;
+    list-style: none;
+    padding: 10px 0;
+    margin-top: 10px;
+}
+
+/* Show dropdown menu when it's active */
+.dropdown-menu.show {
+    display: block;
+}
+
+/* Style for dropdown items */
+.dropdown-item {
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+/* Add some margin to the right side of the profile image */
+.navbar-profile-img {
+    margin-right: 10px;
 }

@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réinitialiser le mot de passe{% endblock %}
+{% block title %}Reset password{% endblock %}
 
 {% block body %}
-    <h1>Réinitialiser votre mot de passe</h1>
+    <h1>Reset password</h1>
 
     {% if app.flashes('success') %}
         <div class="alert alert-success">
@@ -23,10 +23,10 @@
 
     {{ form_start(form) }}
         <div class="form-group">
-            {{ form_label(form.newPassword) }}
+            
             {{ form_widget(form.newPassword, {'attr': {'class': 'form-control'}}) }}
         </div>
-        <button type="submit" class="btn btn-primary">Réinitialiser mon mot de passe</button>
+        <button type="submit" class="btn btn-primary">Reset</button>
     {{ form_end(form) }}
     
     <p>Retour à <a href="{{ path('app_login') }}">la page de connexion</a></p>

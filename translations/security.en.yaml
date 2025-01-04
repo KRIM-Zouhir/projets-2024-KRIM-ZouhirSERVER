@@ -1,0 +1,5 @@
+security:
+    Invalid username/email or password: "Invalid username/email or password."
+    The username/email you entered does not exist: "The username/email you entered does not exist."
+    The password is incorrect: "The password is incorrect."
+    success: "Success Reset Password !"

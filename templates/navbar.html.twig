@@ -3,27 +3,42 @@
         <!-- Logo -->
         <a href="{{ path('app_home') }}" class="navbar-logo">TalkSphere</a>
 
-       
+        <div class="navbar-search">
+            <form action="{{ path('app_search') }}" method="get">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    name="q" 
+                    placeholder="Search topics..." 
+                    aria-label="Search"
+                >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
 
         <!-- Links -->
         <div class="navbar-links">
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_profile') }}" class="navbar-link"> 
-                    <img 
-                        src="{{ app.user.profilePicture ? asset('uploads/profile_pictures/' ~ app.user.profilePicture) : asset('images/default-profile.png') }}" 
-                        alt="Profile Picture" 
-                        class="navbar-profile-img"
-                        onerror="this.src='{{ asset('images/default-profile.png') }}';"
-                    />
-                </a>
-                <a href="{{ path('app_logout') }}" class="navbar-link">Logout</a>
+                <li class="nav-item dropdown">
+                    <a href="#" id="navbarDropdown" class="navbar-link" onclick="toggleDropdown(event)">
+                        <img 
+                            src="{{ app.user.profilePicture ? asset('uploads/profile_pictures/' ~ app.user.profilePicture) : asset('images/default-profile.png') }}" 
+                            alt="Profile Picture" 
+                            class="navbar-profile-img"
+                            onerror="this.src='{{ asset('images/default-profile.png') }}';"
+                        />
+                        {{ app.user.username }}
+                    </a>
+                    <ul class="dropdown-menu" id="dropdownMenu">
+                        <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_logout') }}">Log Out</a></li>
+                    </ul>
+                </li>
             {% else %}
                 <a href="{{ path('app_login') }}" class="navbar-link">Login</a>
                 <a href="{{ path('app_register') }}" class="navbar-link">Register</a>
             {% endif %}
-
             <link rel="stylesheet" href="{{ asset('styles/navbar.css') }}">
-            
         </div>
     </div>
 </nav>
