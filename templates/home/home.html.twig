@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Forum Themes</h1>
+
+    <ul>
+        {% for theme in themes %}
+            <li>
+                <a href="{{ path('app_theme', { id: theme[0].id }) }}">{{ theme[0].name }}</a>
+                <br>
+                Last Discussion: 
+                {% if theme.lastDiscussionDate is not null %}
+                    {{ theme.lastDiscussionDate|date('Y-m-d H:i') }}
+                {% else %}
+                    No discussions
+                {% endif %}
+                <br>
+                Discussions: {{ theme.discussionCount }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if lastPage > 1 %}
+        <div class="pagination">
+            {% for page in 1..lastPage %}
+                <a href="{{ path('app_home', { page: page }) }}" 
+                    class="{% if page == currentPage %}active{% endif %}">
+                    {{ page }}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

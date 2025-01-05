@@ -69,6 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->posts = new ArrayCollection();
         $this->setProfilePicture('default-profile.png');
         $this->createdAt = new \DateTime();
+        $this->discussions = new ArrayCollection();
     }
 
     public function getId(): ?int

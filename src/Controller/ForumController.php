@@ -7,21 +7,30 @@ use App\Entity\Topic;
 use App\Entity\Post;
 use App\Form\TopicType;
 use App\Form\PostType;
+use App\Entity\Theme;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class ForumController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $categories = $entityManager->getRepository(Category::class)->findAll();
-
-        return $this->render('forum/index.html.twig', [
-            'categories' => $categories,
+        $themesPerPage = 5; // Max themes per page
+        $page = $request->query->getInt('page', 1);
+    
+        $themeRepository = $entityManager->getRepository(Theme::class);
+        $themes = $themeRepository->getPaginatedThemes($page, $themesPerPage);
+    
+        return $this->render('home/home.html.twig', [
+            'themes' => $themes['results'],
+            'lastPage' => $themes['lastPage'],
+            'currentPage' => $themes['currentPage'],
+            'totalItems' => $themes['totalItems']
         ]);
     }
 

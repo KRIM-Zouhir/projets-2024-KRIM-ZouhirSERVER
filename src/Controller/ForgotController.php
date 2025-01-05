@@ -44,7 +44,7 @@ class ForgotController extends AbstractController
                 // Envoi de l'email avec le lien de réinitialisation
                 $resetPasswordUrl = $this->generateUrl('app_reset_password', ['token' => $token], 0);
                 $emailMessage = (new Email())
-                    ->from('micmjad@gmail.com')
+                    ->from('micmjad@gmail.com', 'TalkSphere TEAM')
                     ->to($user->getEmail())
                     ->subject('Réinitialisation du mot de passe')
                     ->html(

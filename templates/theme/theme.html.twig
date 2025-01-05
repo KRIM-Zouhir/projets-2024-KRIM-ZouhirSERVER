@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ theme.name }}</h1>
+
+<ul>
+    {% for discussion in discussions %}
+        <li>
+            {{ discussion.author.username }}:
+            {{ discussion.content }}
+            <br>
+            {{ discussion.createdAt|date('Y-m-d H:i') }}
+        </li>
+    {% endfor %}
+</ul>
+
+<div class="pagination">
+    {% for page in 1..discussions.lastPage %}
+        <a href="{{ path('app_theme', { id: theme.id, page: page }) }}" class="{% if page == discussions.currentPage %}active{% endif %}">
+            {{ page }}
+        </a>
+    {% endfor %}
+</div>
+
+{% if app.user %}
+    <form method="post" action="{{ path('app_add_discussion', { id: theme.id }) }}">
+        <textarea name="content" required></textarea>
+        <button type="submit">Add Discussion</button>
+    </form>
+{% endif %}
+{% endblock %}
