@@ -10,7 +10,7 @@
     <style>
         /* Add space below the navbar */
         .main-content {
-            margin-top: 80px; /* Adjust this value as needed */
+            margin-top: 100px; /* Adjust this value as needed */
         }
     </style>
 </head>
@@ -19,6 +19,7 @@
     <!-- Navbar -->
     {% include 'navbar.html.twig' %}
 
+
     <!-- Main Content -->
     <div class="container main-content">
         {% block body %}{% endblock %}
@@ -26,5 +27,17 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('styles/theme.css') }}">
+    <script src="{{ asset('js/theme.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/create.css') }}">
+    <script src="{{ asset('js/create.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/profile.css') }}">
+    <script src="{{ asset('js/profile.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/navbar.css') }}">
+    <script src="{{ asset('js/navbar.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/login.css') }}">
+    <script src="{{ asset('js/login.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/register.css') }}">
+    <script src="{{ asset('js/register.js') }}"></script>
 </body>
 </html>

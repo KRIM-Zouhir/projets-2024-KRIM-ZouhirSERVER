@@ -14,24 +14,30 @@ class ThemeController extends AbstractController
 {
     #[Route('/theme/{id}', name: 'app_theme')]
     public function viewTheme(int $id, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $discussionsPerPage = 10; // Max discussions per page
-        $page = $request->query->getInt('page', 1);
-    
-        $themeRepository = $entityManager->getRepository(Theme::class);
-        $theme = $themeRepository->find($id);
-    
-        if (!$theme) {
-            throw $this->createNotFoundException('Theme not found');
-        }
-    
-        $discussionRepository = $entityManager->getRepository(Discussion::class);
-        $discussions = $discussionRepository->getPaginatedDiscussionsByTheme($id, $page, $discussionsPerPage);
-    
-        return $this->render('theme/theme.html.twig', [
-            'theme' => $theme,
-            'discussions' => $discussions,
-        ]);
+{
+    $discussionsPerPage = 10;
+    $page = $request->query->getInt('page', 1);
+
+    $themeRepository = $entityManager->getRepository(Theme::class);
+    $theme = $themeRepository->find($id);
+
+    if (!$theme) {
+        throw $this->createNotFoundException('Theme not found');
     }
+
+    $discussionRepository = $entityManager->getRepository(Discussion::class);
+    $discussions = $discussionRepository->getPaginatedDiscussionsByTheme($id, $page, $discussionsPerPage);
+    
+    // Calculate total discussions and last page
+    $totalDiscussions = $discussionRepository->count(['theme' => $theme]);
+    $lastPage = ceil($totalDiscussions / $discussionsPerPage);
+
+    return $this->render('theme/theme.html.twig', [
+        'theme' => $theme,
+        'discussions' => $discussions,
+        'lastPage' => $lastPage,
+        'currentPage' => $page
+    ]);
+    } 
     
 }

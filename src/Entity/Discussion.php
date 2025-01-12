@@ -29,6 +29,36 @@ class Discussion
     {
         $this->createdAt = new \DateTimeImmutable();
     }
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+    
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
+        return $this;
+    }
 
-    // Getters and setters here...
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+        // Getters and setters here...
 }

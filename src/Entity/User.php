@@ -70,6 +70,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setProfilePicture('default-profile.png');
         $this->createdAt = new \DateTime();
         $this->discussions = new ArrayCollection();
+        $this->roles = ['ROLE_USER']; // Automatically assign the 'ROLE_USER' role
+
     }
 
     public function getId(): ?int

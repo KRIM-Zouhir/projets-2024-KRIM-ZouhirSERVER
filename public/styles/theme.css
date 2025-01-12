@@ -1,0 +1,99 @@
+.discussion-list {
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+  
+  .discussion-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .discussion-author {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  .discussion-content {
+    margin: 0.5rem 0;
+  }
+  
+  .discussion-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+  
+  .pagination {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+  
+  .pagination a {
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+    transition: all 0.3s ease;
+  }
+  
+  .pagination a.active {
+    background: #007bff;
+    color: white;
+  }
+  
+  .discussion-form {
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+  
+  .discussion-form textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .discussion-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .theme-header {
+    position: relative;
+    height: 200px;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .theme-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .theme-header h1 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    color: white;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    margin: 0;
+  }
+  
+  /* Rest of your existing CSS remains the same */

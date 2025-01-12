@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Entity\Discussion;
 use App\Entity\Theme;
+use App\Form\DiscussionType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,34 +13,50 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class DiscussionController extends AbstractController
 {
-    #[Route('/theme/{id}/add-discussion', name: 'app_add_discussion', methods: ['POST'])]
+    #[Route('/create-discussion', name: 'app_create_discussion')]
     #[IsGranted('ROLE_USER')]
-    public function addDiscussion(
-        int $id, 
-        Request $request, 
+    public function createDiscussion(
+        Request $request,
         EntityManagerInterface $entityManager
     ): Response {
-        $content = $request->request->get('content');
-
-        if (!$content) {
-            $this->addFlash('error', 'Content cannot be empty');
+        $themeId = $request->query->get('theme');
+        $theme = null;
+        
+        if ($themeId) {
+            $theme = $entityManager->getRepository(Theme::class)->find($themeId);
+        }
+    
+        $discussion = new Discussion();
+        $form = $this->createForm(DiscussionType::class, $discussion);
+    
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $discussion->setTheme($theme);
+            $discussion->setAuthor($this->getUser());
+            $discussion->setCreatedAt(new \DateTimeImmutable());
+    
+            $entityManager->persist($discussion);
+            $entityManager->flush();
+    
+            $this->addFlash('success', 'Discussion created successfully!');
             return $this->redirectToRoute('app_theme', ['id' => $id]);
         }
-
-        $theme = $entityManager->getRepository(Theme::class)->find($id);
-        if (!$theme) {
-            throw $this->createNotFoundException('Theme not found');
-        }
-
-        $discussion = new Discussion();
-        $discussion->setTheme($theme);
-        $discussion->setAuthor($this->getUser());
-        $discussion->setContent($content);
-        $discussion->setCreatedAt(new \DateTime());
-
-        $entityManager->persist($discussion);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_theme', ['id' => $id]);
+    
+        // Get discussions for the theme
+        $discussionRepository = $entityManager->getRepository(Discussion::class);
+        $page = $request->query->getInt('page', 1);
+        $discussionsPerPage = 10;
+        $discussions = $discussionRepository->getPaginatedDiscussionsByTheme($id, $page, $discussionsPerPage);
+        
+        $totalDiscussions = $discussionRepository->count(['theme' => $theme]);
+        $lastPage = ceil($totalDiscussions / $discussionsPerPage);
+    
+        return $this->render('theme/theme.html.twig', [
+            'theme' => $theme,
+            'discussions' => $discussions,
+            'lastPage' => $lastPage,
+            'currentPage' => $page,
+            'form' => $form->createView(),
+        ]);
     }
 }

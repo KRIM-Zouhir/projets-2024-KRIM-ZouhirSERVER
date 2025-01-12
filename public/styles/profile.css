@@ -44,10 +44,14 @@ body {
 
 .profile-picture img {
     max-width: 160px; /* Slightly larger profile picture */
+    height: 100px;
+    object-fit: cover;
+    width: 100px;
     border-radius: 50%;
     border: 3px solid #ddd; /* Light gray border for more contrast */
     display: block;
     margin: 0 auto 20px;
+    transition: all 0.3s ease;
 }
 
 .profile-form {

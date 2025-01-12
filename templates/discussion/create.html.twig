@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Create a New Discussion for "{{ theme.name }}"</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.content) }}
+    <button class="btn btn-primary">{{ form.submit.vars.label }}</button>
+{{ form_end(form) }}
+
+<a href="{{ path('app_theme', { id: theme.id }) }}" class="btn btn-secondary mt-3">Back to Theme</a>
+<link rel="stylesheet" href="{{ asset('styles/create.css') }}">
+    <script src="{{ asset('js/create.js') }}"></script>
+{% endblock %}

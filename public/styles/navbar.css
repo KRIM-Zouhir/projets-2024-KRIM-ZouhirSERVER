@@ -1,157 +1,114 @@
-/* Navbar Container */
+/* navbar.css */
 .navbar {
-    background-color: #333;
-    color: #fff;
-    padding: 15px 30px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    width: 100%;
+    background: #000;
+    padding: 1rem;
+    position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .navbar-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-/* Logo/Title Section (Left Corner) */
-.navbar-logo {
-    font-size: 24px;
-    font-weight: bold;
-    text-decoration: none;
-    color: #fff;
-    position: absolute;
-    left: 30px;
-}
-
-.navbar-logo:hover {
-    color: #2b2b2b;
-}
-
-/* Modern Search Bar (Center) */
-.navbar-search {
+    max-width: 1200px;
     margin: 0 auto;
-    width: 40%;
-    max-width: 600px;
-}
-
-.navbar-search form {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    padding: 5px;
-    transition: all 0.3s ease;
+    justify-content: space-between;
 }
 
-.navbar-search form:focus-within {
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+.navbar-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar-search {
+    flex-grow: 1;
+    max-width: 400px;
+    margin: 0 2rem;
 }
 
 .search-input {
     width: 100%;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 50px;
-    background: transparent;
-}
-
-.search-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.search-input:focus {
-    outline: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background: #111;
+    color: #fff;
 }
 
 .search-btn {
-    color: #000000;
-    padding: 8px 20px;
-    background-color: #ffffff;
+    padding: 0.5rem 1rem;
+    background: #333;
+    color: #fff;
     border: none;
-    border-radius: 50px;
-    font-size: 16px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-right: 5px;
 }
 
-.search-btn:hover {
-    background-color: #2b2b2b;
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-/* User Section (Right Corner) */
 .navbar-links {
     display: flex;
     align-items: center;
-    position: absolute;
-    right: 30px;
-    gap: 15px;
+    gap: 1.5rem;
 }
 
-.navbar-link {
-    text-decoration: none;
+.navbar-user {
     color: #fff;
-    font-size: 16px;
+    text-decoration: none;
+}
+
+.create-discussion-btn {
+    width: 40px;
+    height: 40px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 24px;
+    transition: transform 0.2s;
 }
 
-.navbar-link:hover {
-    color: #545454;
+.create-discussion-btn:hover {
+    transform: scale(1.1);
+}
+
+.profile-dropdown {
+    position: relative;
 }
 
 .navbar-profile-img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    object-fit: cover;
-    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #333;
 }
 
-.navbar-profile-img:hover {
-    border-color: #ffffff;
-    transform: scale(1.05);
-}
-
-/* Hide dropdown menu by default */
 .dropdown-menu {
     display: none;
     position: absolute;
-    background-color: #fff;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    min-width: 160px;
-    border-radius: 5px;
-    list-style: none;
-    padding: 10px 0;
-    margin-top: 10px;
+    right: 0;
+    top: 120%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 4px;
+    min-width: 150px;
 }
 
-/* Show dropdown menu when it's active */
 .dropdown-menu.show {
     display: block;
 }
 
-/* Style for dropdown items */
-.dropdown-item {
-    padding: 10px 15px;
-    color: #000;
-    text-decoration: none;
+.dropdown-menu a {
+    color: #fff;
+    padding: 0.75rem 1rem;
     display: block;
+    text-decoration: none;
 }
 
-.dropdown-item:hover {
-    background-color: #f1f1f1;
-}
-
-/* Add some margin to the right side of the profile image */
-.navbar-profile-img {
-    margin-right: 10px;
+.dropdown-menu a:hover {
+    background: #222;
 }
