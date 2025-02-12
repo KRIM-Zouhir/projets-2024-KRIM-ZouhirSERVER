@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Create New Discussion</h2>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_row(form.title) }}
+                {{ form_row(form.community) }}
+                {{ form_row(form.content) }}
+                {{ form_row(form.tags) }}
+                
+                <div class="btn-group mt-3">
+                    <button type="submit" class="btn btn-primary">Post Discussion</button>
+                    <button type="submit" name="save_draft" class="btn btn-secondary">Save as Draft</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

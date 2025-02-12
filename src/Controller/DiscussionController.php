@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Discussion;
 use App\Entity\Theme;
+use App\Entity\Community;
 use App\Form\DiscussionType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,49 +15,32 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class DiscussionController extends AbstractController
 {
-    #[Route('/create-discussion', name: 'app_create_discussion')]
+    #[Route('/discussion/new', name: 'app_create_discussion')]
     #[IsGranted('ROLE_USER')]
-    public function createDiscussion(
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $themeId = $request->query->get('theme');
-        $theme = null;
-        
-        if ($themeId) {
-            $theme = $entityManager->getRepository(Theme::class)->find($themeId);
-        }
-    
+    // DiscussionController.php
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
         $discussion = new Discussion();
+        $discussion->setAuthor($this->getUser());
+        
+        // Get community ID from request if available
+        $communityId = $request->query->get('community');
+        if ($communityId) {
+            $community = $entityManager->getRepository(Community::class)->find($communityId);
+            $discussion->setCommunity($community);
+        }
+
         $form = $this->createForm(DiscussionType::class, $discussion);
-    
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $discussion->setTheme($theme);
-            $discussion->setAuthor($this->getUser());
-            $discussion->setCreatedAt(new \DateTimeImmutable());
-    
             $entityManager->persist($discussion);
             $entityManager->flush();
-    
-            $this->addFlash('success', 'Discussion created successfully!');
-            return $this->redirectToRoute('app_theme', ['id' => $id]);
+
+            return $this->redirectToRoute('app_community_show', ['id' => $discussion->getCommunity()->getId()]);
         }
-    
-        // Get discussions for the theme
-        $discussionRepository = $entityManager->getRepository(Discussion::class);
-        $page = $request->query->getInt('page', 1);
-        $discussionsPerPage = 10;
-        $discussions = $discussionRepository->getPaginatedDiscussionsByTheme($id, $page, $discussionsPerPage);
-        
-        $totalDiscussions = $discussionRepository->count(['theme' => $theme]);
-        $lastPage = ceil($totalDiscussions / $discussionsPerPage);
-    
-        return $this->render('theme/theme.html.twig', [
-            'theme' => $theme,
-            'discussions' => $discussions,
-            'lastPage' => $lastPage,
-            'currentPage' => $page,
+
+        return $this->render('discussion/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
