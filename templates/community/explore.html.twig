@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Explore Communities - TalkSphere{% endblock %}
+
+{% block body %}
+    <div class="explore-container">
+        <div class="explore-header">
+            <h1>Explore Communities</h1>
+            <p>Discover and join communities that interest you</p>
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_community_new') }}" class="btn-create">Create Community</a>
+            {% endif %}
+        </div>
+
+        <div class="communities-grid">
+            {% for community in communities %}
+                <div class="community-card">
+                    <div class="community-banner">
+                        {% if community.bannerImage %}
+                            <img src="{{ asset('uploads/community/banners/' ~ community.bannerImage) }}" 
+                                alt="Banner for {{ community.name }}"
+                                class="banner-img">
+                        {% else %}
+                            <div class="default-banner"></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="community-content">
+                        <div class="community-avatar">
+                            {% if community.avatar %}
+                                <img src="{{ asset('uploads/community/avatars/' ~ community.avatar) }}" 
+                                    alt="Avatar for {{ community.name }}">
+                            {% else %}
+                                <div class="default-avatar">
+                                    {{ community.name|slice(0, 1)|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <h2 class="community-name">{{ community.name }}</h2>
+                        
+                        <div class="community-info">
+                            <span class="member-count">
+                                <i class="fas fa-users"></i>
+                                {{ community.members|length }} members
+                            </span>
+                            <span class="post-count">
+                                <i class="fas fa-comments"></i>
+                                {{ community.discussions|length }} discussions
+                            </span>
+                        </div>
+
+                        <p class="community-description">
+                            {{ community.description|default('No description provided.')|slice(0, 150) }}
+                            {% if community.description|length > 150 %}...{% endif %}
+                        </p>
+
+                        <div class="community-actions">
+                            <a href="{{ path('app_community_show', {'id': community.id}) }}" 
+                               class="btn-view">View Community</a>
+                            
+                            {% if is_granted('ROLE_USER') %}
+                                {% if app.user in community.members %}
+                                    <form action="{{ path('app_community_leave', {'id': community.id}) }}" 
+                                          method="post" class="join-form">
+                                        <button type="submit" class="btn-leave">Leave</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ path('app_community_join', {'id': community.id}) }}" 
+                                          method="post" class="join-form">
+                                        <button type="submit" class="btn-join">Join</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="no-communities">
+                    <h3>No communities found</h3>
+                    <p>Be the first to create a community!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if lastPage > 1 %}
+            <div class="pagination">
+                {% if currentPage > 1 %}
+                    <a href="{{ path('app_community_explore', {'page': currentPage - 1}) }}" class="page-link">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                {% endif %}
+
+                {% for i in 1..lastPage %}
+                    {% if (i == 1) or (i == lastPage) or (i >= currentPage - 2 and i <= currentPage + 2) %}
+                        <a href="{{ path('app_community_explore', {'page': i}) }}" 
+                           class="page-link {{ currentPage == i ? 'active' : '' }}">
+                            {{ i }}
+                        </a>
+                    {% elseif (i == currentPage - 3) or (i == currentPage + 3) %}
+                        <span class="page-dots">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if currentPage < lastPage %}
+                    <a href="{{ path('app_community_explore', {'page': currentPage + 1}) }}" class="page-link">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/community/explore.css') }}">
+{% endblock %}

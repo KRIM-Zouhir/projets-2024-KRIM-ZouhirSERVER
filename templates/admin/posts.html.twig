@@ -1,0 +1,141 @@
+{# templates/admin/posts.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Post Management - Admin Dashboard{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Post Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_admin_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Posts</li>
+            </ol>
+        </nav>
+    </div>
+
+    {# Search and Filter Section #}
+    <div class="content-section">
+        <form class="row g-3" method="get">
+            <div class="col-md-6">
+                <input type="text" name="search" class="form-control" placeholder="Search post content..." 
+                    value="{{ app.request.query.get('search') }}">
+            </div>
+            <div class="col-md-4">
+                <select name="sort" class="form-select">
+                    <option value="newest" {% if app.request.query.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if app.request.query.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="reported" {% if app.request.query.get('sort') == 'reported' %}selected{% endif %}>Reported Posts</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    {# Posts Table #}
+    <div class="content-section">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Content</th>
+                        <th>Author</th>
+                        <th>Topic</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                        <tr>
+                            <td>
+                                <div class="post-content">
+                                    {{ post.content|slice(0, 150) }}{% if post.content|length > 150 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <img src="{{ post.author.getProfilePicture() }}" alt="Avatar" class="user-avatar">
+                                    <span>{{ post.author.username }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{{ path('app_topic_show', {'id': post.topic.id}) }}" class="text-decoration-none">
+                                    {{ post.topic.title|slice(0, 30) }}{% if post.topic.title|length > 30 %}...{% endif %}
+                                </a>
+                            </td>
+                            <td>{{ post.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_topic_show', {'id': post.topic.id}) }}#post-{{ post.id }}" 
+                                       class="btn btn-sm btn-info">View</a>
+                                    <form action="{{ path('app_admin_post_delete', {'id': post.id}) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger ms-1" data-confirm="true">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <h4>No posts found</h4>
+                                    <p class="text-muted">There are no posts matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if posts.haveToPaginate is defined and posts.haveToPaginate %}
+            <div class="pagination justify-content-center mt-4">
+                {{ knp_pagination_render(posts) }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/admin/posts.css') }}">
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete confirmation
+        const deleteButtons = document.querySelectorAll('[data-confirm="true"]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Add quick preview functionality
+        const postContents = document.querySelectorAll('.post-content');
+        postContents.forEach(content => {
+            content.addEventListener('click', function() {
+                if (this.classList.contains('expanded')) {
+                    this.classList.remove('expanded');
+                    this.style.maxHeight = '3.6em';
+                } else {
+                    this.classList.add('expanded');
+                    this.style.maxHeight = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

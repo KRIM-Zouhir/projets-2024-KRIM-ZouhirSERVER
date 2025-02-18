@@ -1,0 +1,145 @@
+/* public/styles/admin/topics.css */
+
+.topic-management {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.topic-title {
+    font-weight: 500;
+    color: #212529;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.topic-title:hover {
+    color: #282828;
+}
+
+.topic-meta {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-view {
+    background-color: #000000;
+    color: white;
+    border: none;
+}
+
+.btn-view:hover {
+    background-color: #282828;
+    color: white;
+}
+
+.btn-delete {
+    background-color: #800c17;
+    color: white;
+    border: none;
+}
+
+.btn-delete:hover {
+    background-color: #1a0306;
+    color: white;
+}
+
+.statistics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-title {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #282828;
+    box-shadow: 0 0 0 2px rgba(6, 6, 6, 0.25);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 24px 0;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    color: #dee2e6;
+    margin-bottom: 16px;
+}
+
+.empty-state-text {
+    color: #6c757d;
+    font-size: 1rem;
+}

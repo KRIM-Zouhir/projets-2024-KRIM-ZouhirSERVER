@@ -61,17 +61,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $passwordResetTokenExpiresAt = null;
 
-    
+    #[ORM\ManyToMany(targetEntity: Community::class, mappedBy: 'members')]
+    private Collection $joinedCommunities;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Discussion::class)]
+    private Collection $discussions;
+
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Community::class)]
+    private Collection $createdCommunities;
 
     public function __construct()
     {
         $this->topics = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->discussions = new ArrayCollection();
+        $this->joinedCommunities = new ArrayCollection();
+        $this->createdCommunities = new ArrayCollection();
         $this->setProfilePicture('default-profile.png');
         $this->createdAt = new \DateTime();
-        $this->discussions = new ArrayCollection();
-        $this->roles = ['ROLE_USER']; // Automatically assign the 'ROLE_USER' role
-
+        $this->roles = ['ROLE_USER']; // Default role
     }
 
     public function getId(): ?int
@@ -234,6 +242,86 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     
     /**
+     * @return Collection<int, Community>
+     */
+    public function getJoinedCommunities(): Collection
+    {
+        return $this->joinedCommunities;
+    }
+
+    public function joinCommunity(Community $community): self
+    {
+        if (!$this->joinedCommunities->contains($community)) {
+            $this->joinedCommunities->add($community);
+            $community->addMember($this);
+        }
+        return $this;
+    }
+
+    public function leaveCommunity(Community $community): self
+    {
+        if ($this->joinedCommunities->removeElement($community)) {
+            $community->removeMember($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Discussion>
+     */
+    public function getDiscussions(): Collection
+    {
+        return $this->discussions;
+    }
+
+    public function addDiscussion(Discussion $discussion): self
+    {
+        if (!$this->discussions->contains($discussion)) {
+            $this->discussions->add($discussion);
+            $discussion->setAuthor($this);
+        }
+        return $this;
+    }
+
+    public function removeDiscussion(Discussion $discussion): self
+    {
+        if ($this->discussions->removeElement($discussion)) {
+            if ($discussion->getAuthor() === $this) {
+                $discussion->setAuthor(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Community>
+     */
+    public function getCreatedCommunities(): Collection
+    {
+        return $this->createdCommunities;
+    }
+
+    public function addCreatedCommunity(Community $community): self
+    {
+        if (!$this->createdCommunities->contains($community)) {
+            $this->createdCommunities->add($community);
+            $community->setCreator($this);
+        }
+        return $this;
+    }
+
+    public function removeCreatedCommunity(Community $community): self
+    {
+        if ($this->createdCommunities->removeElement($community)) {
+            if ($community->getCreator() === $this) {
+                $community->setCreator(null);
+            }
+        }
+        return $this;
+    }
+
+    // Uncomment and fix the Topics and Posts methods as they might be needed
+    /**
      * @return Collection<int, Topic>
      */
     public function getTopics(): Collection
@@ -247,7 +335,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->topics->add($topic);
             $topic->setAuthor($this);
         }
-
         return $this;
     }
 
@@ -258,7 +345,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $topic->setAuthor(null);
             }
         }
-
         return $this;
     }
 
@@ -276,7 +362,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->posts->add($post);
             $post->setAuthor($this);
         }
-
         return $this;
     }
 
@@ -287,7 +372,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $post->setAuthor(null);
             }
         }
+        return $this;
+    }
 
+    // Add new methods for admin functionality
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->roles, true);
+    }
+
+    public function isModerator(): bool
+    {
+        return in_array('ROLE_MODERATOR', $this->roles, true) || $this->isAdmin();
+    }
+
+    public function addRole(string $role): self
+    {
+        $role = strtoupper($role);
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+        return $this;
+    }
+
+    public function removeRole(string $role): self
+    {
+        $role = strtoupper($role);
+        if (($key = array_search($role, $this->roles, true)) !== false) {
+            unset($this->roles[$key]);
+            $this->roles = array_values($this->roles); // Reindex array
+        }
         return $this;
     }
 

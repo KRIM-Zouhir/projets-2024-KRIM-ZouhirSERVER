@@ -1,0 +1,288 @@
+{# navbar.html.twig #}
+<link rel="stylesheet" href="{{ asset('styles/navbar.css') }}">
+
+<nav class="navbar">
+    <div class="navbar-container">
+        {# Left section - Logo #}
+        <div class="navbar-left">
+            <a href="{{ path('app_home') }}" class="navbar-logo">TalkSphere</a>
+        </div>
+        
+        {# Center section - Search #}
+        <div class="navbar-center">
+            <div class="navbar-search">
+                <input type="text" class="search-input" placeholder="Search topics..." aria-label="Search">
+            </div>
+        </div>
+        
+        {# Right section - Actions #}
+        <div class="navbar-right">
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_create_discussion') }}" class="create-discussion-btn">
+                    Create Discussion
+                </a>
+
+                {% if is_granted('ROLE_MODERATOR') %}
+                    <a href="{{ path('app_moderator_dashboard') }}" class="nav-btn">
+                        Mod Panel
+                    </a>
+                {% endif %}
+                
+                {# Profile Dropdown #}
+                <div class="profile-dropdown">
+                    <button class="profile-trigger">
+                        <img src="{{ app.user.getProfilePicture() }}"
+                             alt="Profile"
+                             class="navbar-profile-img"
+                             onerror="this.src='{{ asset('images/default-profile.png') }}';">
+                    </button>
+                    
+                    <div class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <img src="{{ app.user.getProfilePicture() }}"
+                                 alt="Profile"
+                                 class="dropdown-profile-img"
+                                 onerror="this.src='{{ asset('images/default-profile.png') }}';">
+                            <div class="dropdown-user-info">
+                                <span class="dropdown-username">{{ app.user.username }}</span>
+                                {% if is_granted('ROLE_MODERATOR') %}
+                                    <span class="role-badge">Moderator</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <a href="{{ path('app_profile') }}" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <a href="{{ path('app_profile') }}" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ path('app_logout') }}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Log Out
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ path('app_login') }}" class="login-btn">Log In</a>
+                    <a href="{{ path('app_register') }}" class="register-btn">Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<script>document.addEventListener('DOMContentLoaded', () => {
+    // Profile Dropdown
+    initProfileDropdown();
+    
+    // Search Input
+    initSearchInput();
+    
+    // Tab Navigation
+    initTabNavigation();
+
+    // Profile Picture Upload
+    initProfilePictureUpload();
+    
+    // Password Change Form
+    initPasswordChangeForm();
+});
+
+function initProfileDropdown() {
+    const profileTrigger = document.querySelector('.profile-trigger');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    if (profileTrigger && dropdownMenu) {
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        dropdownMenu.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    }
+}
+
+function initSearchInput() {
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => {
+            const searchTerm = e.target.value.trim();
+            if (searchTerm.length >= 2) {
+                performSearch(searchTerm);
+            }
+        }, 300));
+    }
+}
+
+function performSearch(term) {
+    fetch(`/api/search?q=${encodeURIComponent(term)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Handle search results
+            updateSearchResults(data);
+        })
+        .catch(error => console.error('Search error:', error));
+}
+
+function updateSearchResults(results) {
+    const searchResultsContainer = document.querySelector('.search-results');
+    if (searchResultsContainer) {
+        // Update UI with search results
+        searchResultsContainer.innerHTML = results.map(result => `
+            <div class="search-result-item">
+                <a href="${result.url}">${result.title}</a>
+                <p>${result.excerpt}</p>
+            </div>
+        `).join('');
+    }
+}
+
+function initTabNavigation() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+
+            tab.classList.add('active');
+            const targetId = tab.getAttribute('data-target');
+            document.getElementById(targetId)?.classList.add('active');
+        });
+    });
+}
+
+function initProfilePictureUpload() {
+    const profilePictureInput = document.querySelector('.file-input');
+    const profilePreview = document.getElementById('profile-preview');
+    const uploadOverlay = document.querySelector('.upload-overlay');
+
+    if (profilePictureInput && profilePreview) {
+        profilePictureInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                validateAndPreviewImage(file, profilePreview, uploadOverlay);
+            }
+        });
+    }
+}
+
+function validateAndPreviewImage(file, previewElement, overlayElement) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a JPEG, PNG, GIF, or WebP image.');
+        return false;
+    }
+
+    if (file.size > maxSize) {
+        alert('Maximum file size is 5MB.');
+        return false;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        previewElement.src = event.target.result;
+        previewElement.style.display = 'block';
+        if (overlayElement) {
+            overlayElement.style.opacity = '0';
+        }
+    };
+    reader.readAsDataURL(file);
+    return true;
+}
+
+function initPasswordChangeForm() {
+    const form = document.querySelector('.password-change-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('current-password');
+        const newPassword = document.getElementById('new-password');
+        const confirmPassword = document.getElementById('confirm-password');
+
+        clearErrors([currentPassword, newPassword, confirmPassword]);
+
+        const errors = validatePasswordForm(currentPassword, newPassword, confirmPassword);
+        if (Object.keys(errors).length > 0) {
+            displayErrors(errors);
+            return;
+        }
+
+        form.submit();
+    });
+}
+
+function validatePasswordForm(currentPassword, newPassword, confirmPassword) {
+    const errors = {};
+
+    if (!currentPassword.value.trim()) {
+        errors.currentPassword = 'Current password is required';
+    }
+
+    if (newPassword.value.length < 8) {
+        errors.newPassword = 'Password must be at least 8 characters long';
+    }
+
+    if (newPassword.value !== confirmPassword.value) {
+        errors.confirmPassword = 'Passwords do not match';
+    }
+
+    return errors;
+}
+
+function clearErrors(inputs) {
+    inputs.forEach(input => {
+        input.classList.remove('is-invalid');
+        const errorElement = input.nextElementSibling;
+        if (errorElement?.classList.contains('error-message')) {
+            errorElement.remove();
+        }
+    });
+}
+
+function displayErrors(errors) {
+    Object.entries(errors).forEach(([field, message]) => {
+        const input = document.getElementById(field);
+        if (input) {
+            input.classList.add('is-invalid');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message text-danger small mt-1';
+            errorDiv.textContent = message;
+            input.parentNode.insertBefore(errorDiv, input.nextSibling);
+        }
+    });
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}</script>

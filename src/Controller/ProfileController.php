@@ -1,165 +1,214 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\ProfileEditType;
+use App\Service\FileUploader;
+use App\Service\PasswordManagementService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[Route('/profile')]
 class ProfileController extends AbstractController
 {
-    #[Route('/profile', name: 'app_profile')]
-    #[IsGranted("IS_AUTHENTICATED_FULLY")]
-    public function profile(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
-    ): Response {
-         /** @var User $user */
-    $user = $this->getUser();
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FileUploader $fileUploader,
+        private readonly PasswordManagementService $passwordManager
+    ) {}
 
-    $errors = [];
-    $form = $this->createFormBuilder()
-            ->add('profile_picture', FileType::class, [
-                'label' => 'Profile Picture (JPEG/PNG)',
-                'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Upload',
-            ])
-            ->getForm();
-
+    #[Route('', name: 'app_profile', methods: ['GET', 'POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function profile(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(ProfileEditType::class, $user);
         $form->handleRequest($request);
-    // Handle file upload
-    if ($request->isMethod('POST') && $request->files->get('profile_picture')) {
-        /** @var UploadedFile $file */
-        $file = $request->files->get('profile_picture');
 
-        if ($file) {
-            // Validate file type and size if necessary
-            if (!in_array($file->guessExtension(), ['jpg', 'jpeg', 'png'])) {
-                $errors[] = 'Invalid file type. Only JPG, JPEG, and PNG are allowed.';
-            } elseif ($file->getSize() > 5 * 1024 * 1024) { // 5MB limit
-                $errors[] = 'File size exceeds 5MB.';
-            } else {
-                // Generate a unique file name
-                $fileName = uniqid() . '.' . $file->guessExtension();
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $profilePicture = $form->get('profile_picture')->getData();
+                
+                if ($profilePicture) {
+                    $this->fileUploader->setTargetDirectory($this->getParameter('profile_pictures_directory'));
+                    
+                    // Handle profile picture upload
+                    $fileName = $this->fileUploader->upload($profilePicture, $user->getUsername());
 
-                try {
-                    // Move the file to the uploads directory
-                    $file->move(
-                        $this->getParameter('profile_pictures_directory'),
-                        $fileName
-                    );
+                    // Remove old profile picture if it exists
+                    $oldPicture = $user->getProfilePicture();
+                    if ($oldPicture && $oldPicture !== 'default-profile.png') {
+                        $this->fileUploader->remove($oldPicture);
+                    }
 
-                    // Update user's profile picture
                     $user->setProfilePicture($fileName);
-                    $entityManager->flush();
-
-                    $this->addFlash('success', 'Profile picture uploaded successfully.');
-                    return $this->redirectToRoute('app_profile');
-                } catch (\Exception $e) {
-                    $errors[] = 'An error occurred while uploading the file.';
                 }
-            }
-        } else {
-            $errors[] = 'No file was uploaded.';
-        }
-    }
 
-        // Handle other profile updates (username, email, password)
-        if ($request->isMethod('POST')) {
-            $data = $request->request->all();
+                $this->entityManager->flush();
 
-            // Update firstname
-            if (!empty($data['firstname'])) {
-                $existingUser = $entityManager->getRepository(User::class)->findOneBy(['firstname' => $data['firstname']]);
-                $user->setFirstname($data['firstname']); }
-            
-            // Update lastname
-            if (!empty($data['lastname'])) {
-                $existingUser = $entityManager->getRepository(User::class)->findOneBy(['lastname' => $data['lastname']]);
-                $user->setLastname($data['lastname']); }
-
-            
-            // Update username
-            if (!empty($data['username'])) {
-                $existingUser = $entityManager->getRepository(User::class)->findOneBy(['username' => $data['username']]);
-                if ($existingUser && $existingUser !== $user) {
-                    $errors[] = 'The username is already taken.';
-                    $this->addFlash('error', 'The username is already taken.');
-                } else {
-                    $user->setUsername($data['username']);
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'message' => 'Profile updated successfully',
+                        'imageUrl' => $this->getProfilePictureUrl($user)
+                    ]);
                 }
-            }
 
-            // Update email
-            if (!empty($data['email']) && $data['email'] !== $user->getEmail()) {
-                $existingEmail = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
-                if ($existingEmail) {
-                    $errors[] = 'The email is already in use.';
-                    $this->addFlash('error', 'The email is already in use.');
-                } else {
-                    $user->setIsVerified(false);
-                    $user->setEmail($data['email']);
-                }
-            }
-
-            // Update password
-            if (!empty($data['password']) && !empty($data['newPassword'])) {
-                if ($passwordHasher->isPasswordValid($user, $data['password'])) {
-                    $user->setPassword($passwordHasher->hashPassword($user, $data['newPassword']));
-                } else {
-                    $errors[] = 'The current password is incorrect.';
-                    $this->addFlash('error', 'The current password is incorrect.');
-                }
-            }
-
-            if (empty($errors)) {
-                $entityManager->flush();
                 $this->addFlash('success', 'Profile updated successfully.');
                 return $this->redirectToRoute('app_profile');
+
+            } catch (\Exception $e) {
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Failed to update profile: ' . $e->getMessage()
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+
+                $this->addFlash('error', 'Failed to update profile: ' . $e->getMessage());
             }
         }
 
         return $this->render('profile/index.html.twig', [
-            'user' => $user,
-            'errors' => $errors,
-            'form' => $form->createView(),
+            'form' => $form->createView()
         ]);
     }
 
-    #[Route('/profile/remove-picture', name: 'app_remove_profile_picture')]
-    #[IsGranted("IS_AUTHENTICATED_FULLY")]
-    public function removeProfilePicture(EntityManagerInterface $entityManager): Response
+    #[Route('/change-password', name: 'app_profile_change_password', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function changePassword(Request $request): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        $result = $this->passwordManager->changePassword(
+            $this->getUser(),
+            $request->request->get('current_password'),
+            $request->request->get('new_password'),
+            $request->request->get('confirm_password')
+        );
 
-        // Remove the current profile picture if it's not the default one
-        if ($user->getProfilePicture() !== '/images/default-profile.png') {
-            $profilePicturesDirectory = $this->getParameter('profile_pictures_directory');
-            $filePath = $profilePicturesDirectory . '/' . $user->getProfilePicture();
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(
+                $result['success'] 
+                    ? ['message' => 'Password updated successfully'] 
+                    : ['errors' => $result['errors']],
+                $result['success'] ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST
+            );
+        }
 
-            if (file_exists($filePath)) {
-                unlink($filePath); // Delete the file from the server
+        if ($result['success']) {
+            $this->addFlash('success', 'Password updated successfully');
+        } else {
+            foreach ($result['errors'] as $error) {
+                $this->addFlash('error', $error);
             }
         }
 
-        // Set the profile picture to the default one
-        $user->setProfilePicture('default-profile.png'); 
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Profile picture removed successfully.');
         return $this->redirectToRoute('app_profile');
     }
 
-    
+    #[Route('/check-username', name: 'app_profile_check_username', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function checkUsername(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $username = $data['username'] ?? null;
+
+        if (!$username) {
+            return new JsonResponse([
+                'available' => false,
+                'message' => 'Username is required'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        
+        // Allow user to keep their current username
+        if ($currentUser->getUsername() === $username) {
+            return new JsonResponse(['available' => true]);
+        }
+
+        $existingUser = $this->entityManager
+            ->getRepository(User::class)
+            ->findOneBy(['username' => $username]);
+
+        return new JsonResponse([
+            'available' => $existingUser === null
+        ]);
+    }
+
+    #[Route('/remove-picture', name: 'app_profile_remove_picture', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function removeProfilePicture(): JsonResponse
+    {
+        try {
+            /** @var User $user */
+            $user = $this->getUser();
+            
+            $currentPicture = $user->getProfilePicture();
+            if ($currentPicture && $currentPicture !== 'default-profile.png') {
+                $this->fileUploader->setTargetDirectory($this->getParameter('profile_pictures_directory'));
+                $this->fileUploader->remove($currentPicture);
+                
+                $user->setProfilePicture('default-profile.png');
+                $this->entityManager->flush();
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Profile picture removed successfully',
+                'imageUrl' => $this->getProfilePictureUrl($user)
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Failed to remove profile picture'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/delete-account', name: 'app_profile_delete_account', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function deleteAccount(): JsonResponse
+    {
+        try {
+            /** @var User $user */
+            $user = $this->getUser();
+
+            // Remove profile picture if it exists
+            $profilePicture = $user->getProfilePicture();
+            if ($profilePicture && $profilePicture !== 'default-profile.png') {
+                $this->fileUploader->setTargetDirectory($this->getParameter('profile_pictures_directory'));
+                $this->fileUploader->remove($profilePicture);
+            }
+
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Account deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Failed to delete account'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private function getProfilePictureUrl(User $user): string
+    {
+        $profilePicture = $user->getProfilePicture();
+        return $profilePicture
+            ? '/uploads/profile-pictures/' . $profilePicture
+            : '/images/default-profile.png';
+    }
 }

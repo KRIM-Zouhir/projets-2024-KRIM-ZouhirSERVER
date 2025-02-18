@@ -1,0 +1,90 @@
+/* Black and White Theme for Discussion Creation */
+
+:root {
+    --primary-black: #000000;
+    --primary-white: #FFFFFF;
+    --gray-background: #F5F5F5;
+    --gray-border: #D3D3D3;
+}
+
+body {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+    line-height: 1.6;
+}
+
+.container {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.card {
+    border: 2px solid var(--primary-black);
+    background-color: var(--primary-white);
+    box-shadow: 5px 5px 0 var(--primary-black);
+}
+
+.card-header {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    padding: 15px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.form-control {
+    border: 1px solid var(--primary-black);
+    background-color: var(--gray-background);
+    color: var(--primary-black);
+}
+
+.form-control:focus {
+    border-color: var(--primary-black);
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--primary-black);
+    border-color: var(--primary-black);
+    color: var(--primary-white);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--gray-background);
+    color: var(--primary-black);
+    border-color: var(--primary-black);
+}
+
+.btn-secondary {
+    background-color: var(--gray-background);
+    border-color: var(--primary-black);
+    color: var(--primary-black);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+/* Form-specific styles */
+label {
+    font-weight: bold;
+    color: var(--primary-black);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+}

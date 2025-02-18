@@ -1,0 +1,17 @@
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* If you have sidebar, adjust the container accordingly */
+  .with-sidebar .page-container {
+    margin-left: 280px; /* Adjust based on your sidebar width */
+  }
+  
+  /* Make it responsive */
+  @media (max-width: 768px) {
+    .with-sidebar .page-container {
+      margin-left: 0;
+    }
+  }

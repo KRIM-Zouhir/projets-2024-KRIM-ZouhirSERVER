@@ -1,0 +1,143 @@
+{# templates/admin/communities.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Community Management - Moderator Dashboard{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Community Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_moderator_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Communities</li>
+            </ol>
+        </nav>
+    </div>
+
+    {# Search and Filter Section #}
+    <div class="content-section">
+        <form class="row g-3" method="get">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search communities..." 
+                       value="{{ app.request.query.get('search') }}">
+            </div>
+            <div class="col-md-3">
+                <select name="sort" class="form-select">
+                    <option value="newest" {% if app.request.query.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if app.request.query.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="members" {% if app.request.query.get('sort') == 'members' %}selected{% endif %}>Most Members</option>
+                    <option value="activity" {% if app.request.query.get('sort') == 'activity' %}selected{% endif %}>Most Active</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="active" {% if app.request.query.get('status') == 'active' %}selected{% endif %}>Active</option>
+                    <option value="archived" {% if app.request.query.get('status') == 'archived' %}selected{% endif %}>Archived</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    {# Communities Table #}
+    <div class="content-section">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Community</th>
+                        <th>Creator</th>
+                        <th>Members</th>
+                        <th>Discussions</th>
+                        <th>Created Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for community in communities %}
+                        <tr>
+                            <td>
+                                <div class="community-info">
+                                    <img src="{{ asset(community.image ?? 'images/default-community.png') }}" 
+                                         alt="{{ community.name }}" 
+                                         class="community-avatar">
+                                    <div class="community-details">
+                                        <span class="community-name">{{ community.name }}</span>
+                                        <small class="community-description">{{ community.description|slice(0, 50) }}...</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <img src="{{ asset(community.creator.profilePicture ?? 'images/default-avatar.png') }}" 
+                                         alt="{{ community.creator.username }}'s avatar" 
+                                         class="user-avatar">
+                                    <span>{{ community.creator.username }}</span>
+                                </div>
+                            </td>
+                            <td>{{ community.members|length }}</td>
+                            <td>{{ community.discussions|length }}</td>
+                            <td>{{ community.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <span class="badge {{ community.isArchived ? 'bg-warning' : 'bg-success' }}">
+                                    {{ community.isArchived ? 'Archived' : 'Active' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_community_show', {'id': community.id}) }}" 
+                                       class="btn btn-sm btn-info">View</a>
+                                    <button type="button" 
+                                            class="btn btn-sm {{ community.isArchived ? 'btn-success' : 'btn-warning' }}"
+                                            onclick="toggleArchiveStatus({{ community.id }}, {{ community.isArchived ? 'false' : 'true' }})">
+                                        {{ community.isArchived ? 'Activate' : 'Archive' }}
+                                    </button>
+                                    <form action="{{ path('app_moderator_community_delete', {'id': community.id}) }}" 
+                                          method="post" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this community? This action cannot be undone.')">
+                                        <button type="submit" class="btn btn-sm btn-danger ms-1">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-users fa-3x mb-3"></i>
+                                    <h4>No Communities Found</h4>
+                                    <p class="text-muted">There are no communities matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if communities.haveToPaginate is defined and communities.haveToPaginate %}
+            <div class="pagination justify-content-center mt-4">
+                {{ knp_pagination_render(communities) }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin/communities.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/admin/communities.js') }}"></script>
+{% endblock %}

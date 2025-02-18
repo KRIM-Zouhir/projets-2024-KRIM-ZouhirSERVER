@@ -1,24 +1,106 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Forum Themes</h1>
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/home.css') }}">
+{% endblock %}
 
-    <ul>
-        {% for theme in themes %}
-            <li>
-                <a href="{{ path('app_theme', { id: theme[0].id }) }}">{{ theme[0].name }}</a>
-                <br>
-                Last Discussion: 
-                {% if theme.lastDiscussionDate is not null %}
-                    {{ theme.lastDiscussionDate|date('Y-m-d H:i') }}
-                {% else %}
-                    No discussions
-                {% endif %}
-                <br>
-                Discussions: {{ theme.discussionCount }}
-            </li>
-        {% endfor %}
-    </ul>
+{% block body %}
+<div class="home-container">
+    <div class="feed-toggle">
+        <button class="active" data-feed="following">Following</button>
+        <button data-feed="explore">Explore</button>
+    </div>
+
+    <div class="discussions-list" id="following-feed">
+        {% if app.user and user_following_discussions is defined and user_following_discussions|length > 0 %}
+            {% for discussion in user_following_discussions %}
+                <article class="discussion-card">
+                    <div class="discussion-header">
+                        <img src="{{ discussion.community.avatar }}" alt="{{ discussion.community.name }}" class="community-avatar">
+                        <div class="discussion-meta">
+                            <a href="{{ path('app_community_show', {id: discussion.community.id}) }}" class="community-name">
+                                {{ discussion.community.name }}
+                            </a>
+                            <div class="discussion-author">
+                                Posted by {{ discussion.author.username }} • {{ discussion.createdAt|date('Y-m-d H:i') }}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ path('app_discussion_show', {id: discussion.id}) }}" class="discussion-title">
+                        {{ discussion.title }}
+                    </a>
+                    <div class="discussion-preview">
+                        {{ discussion.content|striptags|slice(0, 200) }}{% if discussion.content|length > 200 %}...{% endif %}
+                    </div>
+                    <div class="discussion-footer">
+                        <div class="discussion-stat">
+                            <i class="far fa-comment"></i>
+                            {{ discussion.comments|length }} comments
+                        </div>
+                        <div class="discussion-stat">
+                            <i class="far fa-eye"></i>
+                            {{ discussion.views }} views
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No discussions yet</h3>
+                <p>Follow some communities to see their discussions here</p>
+                <a href="{{ path('app_community_explore') }}" class="btn-create">
+                    <i class="fas fa-compass"></i>
+                    Explore Communities
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="discussions-list" id="explore-feed" style="display: none;">
+        {% if explore_discussions is defined and explore_discussions|length > 0 %}
+            {% for discussion in explore_discussions %}
+                <article class="discussion-card">
+                    <div class="discussion-header">
+                        <img src="{{ discussion.community.avatar }}" alt="{{ discussion.community.name }}" class="community-avatar">
+                        <div class="discussion-meta">
+                            <a href="{{ path('app_community_show', {id: discussion.community.id}) }}" class="community-name">
+                                {{ discussion.community.name }}
+                            </a>
+                            <div class="discussion-author">
+                                Posted by {{ discussion.author.username }} • {{ discussion.createdAt|date('Y-m-d H:i') }}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ path('app_discussion_show', {id: discussion.id}) }}" class="discussion-title">
+                        {{ discussion.title }}
+                    </a>
+                    <div class="discussion-preview">
+                        {{ discussion.content|striptags|slice(0, 200) }}{% if discussion.content|length > 200 %}...{% endif %}
+                    </div>
+                    <div class="discussion-footer">
+                        <div class="discussion-stat">
+                            <i class="far fa-comment"></i>
+                            {{ discussion.comments|length }} comments
+                        </div>
+                        <div class="discussion-stat">
+                            <i class="far fa-eye"></i>
+                            {{ discussion.views }} views
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No discussions to show</h3>
+                <p>Be the first to start a discussion!</p>
+                <a href="{{ path('app_create_discussion') }}" class="btn-create">
+                    <i class="fas fa-plus"></i>
+                    Create Discussion
+                </a>
+            </div>
+        {% endif %}
+    </div>
 
     {% if lastPage > 1 %}
         <div class="pagination">
@@ -30,4 +112,10 @@
             {% endfor %}
         </div>
     {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/home.js') }}"></script>
 {% endblock %}

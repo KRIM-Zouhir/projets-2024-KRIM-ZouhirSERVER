@@ -1,0 +1,142 @@
+.community-create {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.community-form-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.community-form-container h2 {
+    margin-bottom: 30px;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.image-upload-section {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.banner-upload {
+    position: relative;
+    margin-bottom: -50px;
+}
+
+.banner-preview {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.banner-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-upload {
+    position: relative;
+    width: 100px;
+    margin-left: 30px;
+    z-index: 2;
+}
+
+.avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    border: 4px solid #ffffff;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+}
+
+.banner-preview:hover .upload-overlay,
+.avatar-preview:hover .upload-overlay {
+    opacity: 1;
+}
+
+.upload-overlay i {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.form-fields {
+    margin-top: 70px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color:rgb(33, 33, 33);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.submit-btn {
+    background:rgb(0, 0, 0);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+    background:rgb(31, 31, 31);
+}
+
+.error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 4px;
+}

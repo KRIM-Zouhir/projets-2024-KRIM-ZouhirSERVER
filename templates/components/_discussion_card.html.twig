@@ -1,0 +1,48 @@
+{# templates/components/_discussion_card.html.twig #}
+<article class="discussion-card">
+    <div class="discussion-header">
+        <img src="{{ discussion.community.avatar }}" 
+             alt="{{ discussion.community.name }}" 
+             class="community-avatar"
+             loading="lazy">
+        <div class="discussion-meta">
+            <a href="{{ path('app_community_show', {id: discussion.community.id}) }}" 
+               class="community-name">
+                {{ discussion.community.name }}
+            </a>
+            <div class="discussion-author">
+                Posted by {{ discussion.author.username }} • {{ discussion.createdAt|ago }}
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ path('app_discussion_show', {id: discussion.id}) }}" 
+       class="discussion-title">
+        {{ discussion.title }}
+    </a>
+
+    <div class="discussion-preview">
+        {{ discussion.content|striptags|slice(0, 200) }}{% if discussion.content|length > 200 %}...{% endif %}
+    </div>
+
+    <div class="discussion-footer">
+        <div class="discussion-stat">
+            <i class="far fa-comment"></i>
+            {{ discussion.comments|length }} comments
+        </div>
+        <div class="discussion-stat">
+            <i class="far fa-eye"></i>
+            {{ discussion.views }} views
+        </div>
+        {% if app.user %}
+            <div class="discussion-actions">
+                <button class="btn-action" title="Save for later">
+                    <i class="far fa-bookmark"></i>
+                </button>
+                <button class="btn-action" title="Share">
+                    <i class="far fa-share-square"></i>
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</article>

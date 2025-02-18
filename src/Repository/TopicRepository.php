@@ -13,21 +13,37 @@ class TopicRepository extends ServiceEntityRepository
         parent::__construct($registry, Topic::class);
     }
 
-    public function save(Topic $entity, bool $flush = false): void
+    /**
+     * Find recent topics with their authors
+     *
+     * @param int $limit Maximum number of topics to return
+     * @return array
+     */
+    public function findRecentTopics(int $limit = 5): array
     {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        return $this->createQueryBuilder('t')
+            ->select('t', 'a') // Select topics and authors
+            ->leftJoin('t.author', 'a')
+            ->orderBy('t.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
-    public function remove(Topic $entity, bool $flush = false): void
+    /**
+     * Count topics created today
+     *
+     * @return int
+     */
+    public function countTodayTopics(): int
     {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $today = new \DateTime('today');
+        
+        return $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.createdAt >= :today')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

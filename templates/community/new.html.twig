@@ -1,18 +1,162 @@
+{# new.html.twig #}
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/community.css') }}">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h2>Create New Community</h2>
-        </div>
-        <div class="card-body">
-            {{ form_start(form) }}
-                {{ form_row(form.name) }}
-                {{ form_row(form.description) }}
-                <button type="submit" class="btn btn-primary">Create Community</button>
-            {{ form_end(form) }}
-        </div>
+<div class="community-create">
+    <div class="community-form-container">
+        <h2>Create New Community</h2>
+        
+        {{ form_start(form, {'attr': {'class': 'community-form'}}) }}
+            <div class="image-upload-section">
+                <div class="banner-upload">
+                    <div class="banner-preview" id="banner-preview">
+                        <img src="{{ asset('images/default-banner.jpg') }}" alt="Banner preview">
+                        <div class="upload-overlay">
+                            <i class="fas fa-camera"></i>
+                            <span>Upload Banner</span>
+                        </div>
+                    </div>
+                    <input type="file" name="banner" id="banner-input" accept="image/*" class="hidden-input">
+                </div>
+
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="avatar-preview">
+                        <img src="{{ asset('images/default-community.png') }}" alt="Avatar preview">
+                        <div class="upload-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden-input">
+                </div>
+            </div>
+
+            <div class="form-fields">
+                {{ form_row(form.name, {
+                    'attr': {'class': 'form-control', 'placeholder': 'Community Name'}
+                }) }}
+                
+                {{ form_row(form.description, {
+                    'attr': {
+                        'class': 'form-control',
+                        'placeholder': 'Describe your community...',
+                        'rows': 4
+                    }
+                }) }}
+            </div>
+
+            <button type="submit" class="submit-btn">Create Community</button>
+        {{ form_end(form) }}
     </div>
 </div>
+
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const bannerInput = document.getElementById('banner-input');
+    const avatarInput = document.getElementById('avatar-input');
+    const bannerPreview = document.querySelector('#banner-preview img');
+    const avatarPreview = document.querySelector('#avatar-preview img');
+
+    // Banner upload handling
+    document.querySelector('.banner-preview').addEventListener('click', () => {
+        bannerInput.click();
+    });
+
+    bannerInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file && validateImage(file)) {
+            previewImage(file, bannerPreview);
+        }
+    });
+
+    // Avatar upload handling
+    document.querySelector('.avatar-preview').addEventListener('click', () => {
+        avatarInput.click();
+    });
+
+    avatarInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file && validateImage(file)) {
+            previewImage(file, avatarPreview);
+        }
+    });
+
+    function validateImage(file) {
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
+            return false;
+        }
+
+        if (file.size > maxSize) {
+            alert('Image size must be less than 5MB');
+            return false;
+        }
+
+        return true;
+    }
+
+    function previewImage(file, previewElement) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewElement.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Form validation
+    const form = document.querySelector('.community-form');
+    form.addEventListener('submit', (e) => {
+        const nameInput = form.querySelector('input[name="community[name]"]');
+        const descriptionInput = form.querySelector('textarea[name="community[description]"]');
+        
+        removeErrors();
+
+        let isValid = true;
+
+        if (!nameInput.value.trim()) {
+            showError(nameInput, 'Community name is required');
+            isValid = false;
+        } else if (nameInput.value.length < 3) {
+            showError(nameInput, 'Community name must be at least 3 characters');
+            isValid = false;
+        }
+
+        if (!descriptionInput.value.trim()) {
+            showError(descriptionInput, 'Community description is required');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    function showError(element, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = message;
+        element.parentNode.appendChild(errorDiv);
+        element.classList.add('is-invalid');
+    }
+
+    function removeErrors() {
+        document.querySelectorAll('.error').forEach(error => error.remove());
+        document.querySelectorAll('.is-invalid').forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+    }
+});
+</script>
 {% endblock %}

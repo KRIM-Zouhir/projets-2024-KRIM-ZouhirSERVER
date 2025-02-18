@@ -1,229 +1,215 @@
-/* Modern Black & White Navbar Theme */
+/* navbar.css */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  height: 60px;
   background: #000000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  height: 64px;
 }
 
 .navbar-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 20px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0.75rem 2rem;
-  height: 100%;
+}
+
+.navbar-left {
+  flex-shrink: 0;
+  min-width: 200px;
 }
 
 .navbar-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
   color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
   text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: opacity 0.2s ease;
 }
 
-.navbar-logo:hover {
-  opacity: 0.9;
+.navbar-center {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 20px;
 }
 
 .navbar-search {
-  flex: 1;
-  max-width: 500px;
-  margin: 0 2rem;
+  max-width: 600px;
+  width: 100%;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1.25rem;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  background: #111111;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: none;
+  background: #262626;
   color: #ffffff;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.search-input::placeholder {
-  color: #666666;
+  font-size: 14px;
 }
 
 .search-input:focus {
-  border-color: #ffffff;
-  background: #1a1a1a;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  outline: none;
+  background: #333333;
 }
 
-.navbar-links {
+.navbar-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 12px;
 }
 
-.navbar-link {
-  text-decoration: none;
+.create-discussion-btn,
+.nav-btn {
+  background: #000000;
   color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
   font-weight: 500;
-  transition: opacity 0.2s ease;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-}
-
-.navbar-link:hover {
-  opacity: 0.8;
-  background: #1a1a1a;
-}
-
-.btn-primary {
-  background: #ffffff;
-  color: #000000;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
+  font-size: 14px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  border: 1px solid #333;
+  transition: all 0.2s;
 }
 
-.btn-primary:hover {
-  background: #f0f0f0;
-  transform: translateY(-1px);
+.create-discussion-btn:hover,
+.nav-btn:hover {
+  background: #333;
 }
 
-.create-discussion-btn {
-  background: #333333;
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.create-discussion-btn:hover {
-  background: #444444;
-}
-
-/* Profile Dropdown Styles */
 .profile-dropdown {
   position: relative;
 }
 
-.navbar-profile-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  padding: 2px;
   cursor: pointer;
-  object-fit: cover;
-  border: 2px solid #333333;
-  transition: border-color 0.2s ease;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 
-.navbar-profile-img:hover {
-  border-color: #ffffff;
+.profile-trigger:hover {
+  border-color: #333;
+}
+
+.navbar-profile-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   right: 0;
   width: 240px;
   background: #000000;
-  border: 1px solid #333333;
+  border: 1px solid #333;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  padding: 0.5rem 0;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: none;
 }
 
-.dropdown-menu.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+.dropdown-menu.show {
+  display: block;
 }
 
 .dropdown-header {
-  padding: 1rem;
-  border-bottom: 1px solid #333333;
+  padding: 16px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.username {
-  display: block;
+.dropdown-profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-username {
   color: #ffffff;
   font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
+  font-size: 14px;
 }
 
-.email {
-  display: block;
-  color: #666666;
-  font-size: 0.875rem;
-}
-
-.dropdown-divider {
-  height: 1px;
-  background: #333333;
-  margin: 0.5rem 0;
+.role-badge {
+  color: #666;
+  font-size: 12px;
 }
 
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  gap: 12px;
+  padding: 12px 16px;
   color: #ffffff;
   text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-
-.dropdown-item i {
-  font-size: 1rem;
-  color: #666666;
+  transition: background-color 0.2s;
 }
 
 .dropdown-item:hover {
-  background-color: #1a1a1a;
+  background: #333;
 }
 
-.dropdown-item.text-danger {
-  color: #ff4444;
+.dropdown-item i {
+  width: 20px;
+  color: #666;
 }
 
-.dropdown-item.text-danger:hover {
-  background-color: rgba(255, 68, 68, 0.1);
+.dropdown-divider {
+  height: 1px;
+  background: #333;
+  margin: 4px 0;
 }
 
-/* Moderator specific styles */
-.navbar-link[href*="moderation"] {
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.login-btn {
   color: #ffffff;
-  background: #333333;
-  padding: 0.5rem 1rem;
+  text-decoration: none;
+  padding: 8px 16px;
   border-radius: 6px;
+  transition: all 0.2s;
 }
 
-.navbar-link[href*="moderation"]:hover {
-  background: #444444;
+.register-btn {
+  background: #ffffff;
+  color: #000000;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
-  .navbar-search {
-    display: none;
+  .navbar-center {
+      display: none;
   }
   
-  .navbar-container {
-    padding: 0.75rem 1rem;
-  }
-  
-  .btn-primary, .create-discussion-btn {
-    padding: 0.5rem;
+  .create-discussion-btn span {
+      display: none;
   }
 }
+

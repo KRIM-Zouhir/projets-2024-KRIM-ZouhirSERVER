@@ -21,21 +21,48 @@ class Community
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bannerImage = null;
+
     #[ORM\OneToMany(mappedBy: 'community', targetEntity: Discussion::class)]
     private Collection $discussions;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $creator = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'joinedCommunities')]
+    #[ORM\JoinTable(name: 'community_members')]
+    private Collection $members;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isArchived = false;
 
     public function __construct()
     {
         $this->discussions = new ArrayCollection();
+        $this->members = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->isArchived = false;
+
     }
 
+    public function isArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setIsArchived(bool $isArchived): self
+    {
+        $this->isArchived = $isArchived;
+        return $this;
+    }
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +87,28 @@ class Community
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+        return $this;
+    }
+
+    public function getBannerImage(): ?string
+    {
+        return $this->bannerImage;
+    }
+
+    public function setBannerImage(?string $bannerImage): self
+    {
+        $this->bannerImage = $bannerImage;
         return $this;
     }
 
@@ -110,5 +159,42 @@ class Community
             }
         }
         return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(User $member): self
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+        }
+        return $this;
+    }
+
+    public function removeMember(User $member): self
+    {
+        $this->members->removeElement($member);
+        return $this;
+    }
+
+    public function isMember(User $user): bool
+    {
+        return $this->members->contains($user);
+    }
+
+    public function getMemberCount(): int
+    {
+        return $this->members->count();
+    }
+
+    public function getDiscussionCount(): int
+    {
+        return $this->discussions->count();
     }
 }

@@ -13,21 +13,37 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
 
-    public function save(Post $entity, bool $flush = false): void
+    /**
+     * Find recent posts with their authors
+     *
+     * @param int $limit Maximum number of posts to return
+     * @return array
+     */
+    public function findRecentPosts(int $limit = 5): array
     {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        return $this->createQueryBuilder('p')
+            ->select('p', 'a') // Select posts and authors
+            ->leftJoin('p.author', 'a')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
-    public function remove(Post $entity, bool $flush = false): void
+    /**
+     * Count posts created today
+     *
+     * @return int
+     */
+    public function countTodayPosts(): int
     {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $today = new \DateTime('today');
+        
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.createdAt >= :today')
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

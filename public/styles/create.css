@@ -1,55 +1,90 @@
-.create-form {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    opacity: 0;
-    transform: translateY(20px);
+/* Black and White Theme for Discussion Creation */
+
+:root {
+  --primary-black: #000000;
+  --primary-white: #FFFFFF;
+  --gray-background: #F5F5F5;
+  --gray-border: #D3D3D3;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--primary-white);
+  color: var(--primary-black);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  border: 2px solid var(--primary-black);
+  background-color: var(--primary-white);
+  box-shadow: 5px 5px 0 var(--primary-black);
+}
+
+.card-header {
+  background-color: var(--primary-black);
+  color: var(--primary-white);
+  padding: 15px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.form-control {
+  border: 1px solid var(--primary-black);
+  background-color: var(--gray-background);
+  color: var(--primary-black);
+}
+
+.form-control:focus {
+  border-color: var(--primary-black);
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary {
+  background-color: var(--primary-black);
+  border-color: var(--primary-black);
+  color: var(--primary-white);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--gray-background);
+  color: var(--primary-black);
+  border-color: var(--primary-black);
+}
+
+.btn-secondary {
+  background-color: var(--gray-background);
+  border-color: var(--primary-black);
+  color: var(--primary-black);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-black);
+  color: var(--primary-white);
+}
+
+/* Form-specific styles */
+label {
+  font-weight: bold;
+  color: var(--primary-black);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+      padding: 10px;
   }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 600;
-  }
-  
-  .form-group textarea {
-    width: 100%;
-    min-height: 150px;
-    padding: 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    transition: border-color 0.3s ease;
-  }
-  
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-  }
-  
-  .btn-primary {
-    background: #007bff;
-    color: white;
-  }
-  
-  .btn-secondary {
-    background: #6c757d;
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .back-link {
-    margin-top: 1rem;
-    display: block;
-  }
+}

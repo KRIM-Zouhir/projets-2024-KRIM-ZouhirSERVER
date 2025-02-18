@@ -1,0 +1,218 @@
+{# templates/admin/users.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management - Moderator Dashboard{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>User Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_moderator_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Users</li>
+            </ol>
+        </nav>
+    </div>
+
+    {# Search and Filter Section #}
+    <div class="content-section">
+        <form class="row g-3" method="get">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search users..." 
+                    value="{{ app.request.query.get('search') }}">
+            </div>
+            <div class="col-md-3">
+                <select name="role" class="form-select">
+                    <option value="">All Roles</option>
+                    <option value="ROLE_MODERATOR" {% if app.request.query.get('role') == 'ROLE_MODERATOR' %}selected{% endif %}>Moderator</option>
+                    <option value="ROLE_USER" {% if app.request.query.get('role') == 'ROLE_USER' %}selected{% endif %}>User</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="1" {% if app.request.query.get('status') == '1' %}selected{% endif %}>Verified</option>
+                    <option value="0" {% if app.request.query.get('status') == '0' %}selected{% endif %}>Unverified</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    {# Users Table #}
+    <div class="content-section">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <img src="{{ asset(user.profilePicture ?? 'images/default-avatar.png') }}" 
+                                         alt="Avatar" 
+                                         class="user-avatar">
+                                    <span>{{ user.username }}</span>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if 'ROLE_MODERATOR' in user.roles %}
+                                    <span class="badge badge-moderator">Moderator</span>
+                                {% else %}
+                                    <span class="badge badge-user">User</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.isVerified %}
+                                    <span class="badge bg-success">Verified</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Unverified</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                {% if user.id != app.user.id %}
+                                    {% if 'ROLE_MODERATOR' not in user.roles %}
+                                        <form action="{{ path('app_moderator_user_role', {'id': user.id}) }}" method="post" class="d-inline">
+                                            <input type="hidden" name="action" value="add">
+                                            <button type="submit" class="btn btn-sm btn-success" 
+                                                    onclick="return confirm('Make this user a moderator?')">
+                                                Make Moderator
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{{ path('app_moderator_user_role', {'id': user.id}) }}" method="post" class="d-inline">
+                                            <input type="hidden" name="action" value="remove">
+                                            <button type="submit" class="btn btn-sm btn-warning" 
+                                                    onclick="return confirm('Remove moderator privileges from this user?')">
+                                                Remove Moderator
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-users fa-3x mb-3"></i>
+                                    <h4>No users found</h4>
+                                    <p class="text-muted">There are no users matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if users.haveToPaginate is defined and users.haveToPaginate %}
+            <div class="pagination justify-content-center mt-4">
+                {{ knp_pagination_render(users) }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/admin/users.css') }}">
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.role-update-form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const button = form.querySelector('button[type="submit"]');
+                    const originalText = button.innerHTML;
+                    
+                    try {
+                        // Show loading state
+                        button.disabled = true;
+                        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                        
+                        // Remove existing alerts
+                        document.querySelectorAll('.alert').forEach(el => el.remove());
+                        
+                        const formData = new FormData(form);
+                        
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        // Clone response for error handling
+                        const responseClone = response.clone();
+                        
+                        let data;
+                        try {
+                            data = await response.json();
+                        } catch (error) {
+                            // If JSON parsing fails, get text content for debugging
+                            const textContent = await responseClone.text();
+                            console.error('Raw response:', textContent);
+                            throw new Error('Invalid server response format');
+                        }
+
+                        if (!response.ok) {
+                            throw new Error(data.message || `Server error: ${response.status}`);
+                        }
+
+                        if (data.success) {
+                            showAlert('success', data.message);
+                            // Reload page after success
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            throw new Error(data.message || 'Operation failed');
+                        }
+
+                    } catch (error) {
+                        console.error('Operation failed:', error);
+                        showAlert('danger', `Error: ${error.message}`);
+                        // Reset button state
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                    }
+                });
+            });
+            
+            function showAlert(type, message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                const container = document.querySelector('.admin-header');
+                container.insertAdjacentElement('afterend', alertDiv);
+            }
+        });
+    </script>
+{% endblock %}

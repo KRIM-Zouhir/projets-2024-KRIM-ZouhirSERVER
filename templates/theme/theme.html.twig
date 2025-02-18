@@ -1,36 +1,55 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ theme.name }} - TalkSphere{% endblock %}
+
 {% block body %}
-<div class="theme-header">
-    <img src="{{ asset('images/themes/' ~ theme.name|lower ~ '.png') }}" alt="{{ theme.name }}">
-    <h1>{{ theme.name }}</h1>
-</div>
-<h1>{{ theme.name }}</h1>
+    {# Theme Header #}
+    <div class="theme-header">
+        <img src="{{ asset('images/themes/' ~ theme.name|lower ~ '.png') }}" alt="{{ theme.name }}">
+        <h1>{{ theme.name }}</h1>
+    </div>
 
-<ul>
-    {% for discussion in discussions %}
-        <li>
-            {{ discussion.author.username }}:
-            {{ discussion.content }}
-            <br>
-            {{ discussion.createdAt|date('Y-m-d H:i') }}
-        </li>
-    {% endfor %}
-</ul>
+    {# Discussions List #}
+    <div class="discussions-list">
+        {% for discussion in discussions %}
+            <div class="discussion-item">
+                <div class="discussion-author">
+                    <img src="{{ discussion.author.getProfilePicture() }}" 
+                         alt="{{ discussion.author.username }}"
+                         onerror="this.src='{{ asset('images/default-profile.png') }}';">
+                    <div>
+                        <strong>{{ discussion.author.username }}</strong>
+                        <div class="discussion-metadata">
+                            {{ discussion.createdAt|date('M d, Y H:i') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="discussion-content">
+                    {{ discussion.content }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
-<div class="pagination">
-    {% for page in 1..lastPage %}
-        <a href="{{ path('app_theme', { id: theme.id, page: page }) }}" class="{% if page == currentPage %}active{% endif %}">
-            {{ page }}
-        </a>
-    {% endfor %}
-</div>
+    {# Pagination #}
+    <div class="pagination">
+        {% for page in 1..lastPage %}
+            <a href="{{ path('app_theme', { id: theme.id, page: page }) }}" 
+               class="{% if page == currentPage %}active{% endif %}">
+                {{ page }}
+            </a>
+        {% endfor %}
+    </div>
 
-{% if app.user %}
-    <form method="post" action="{{ path('app_create_discussion', { id: theme.id }) }}">
-        <textarea name="content" required></textarea>
-        <button type="submit">Add Discussion</button>
-    </form>
-{% endif %}
-
+    {# Create Discussion Form #}
+    {% if app.user %}
+        <form method="post" 
+              action="{{ path('app_create_discussion', { id: theme.id }) }}" 
+              class="discussion-form">
+            <textarea name="content" 
+                      required 
+                      placeholder="Share your thoughts..."></textarea>
+            <button type="submit">Add Discussion</button>
+        </form>
+    {% endif %}
 {% endblock %}

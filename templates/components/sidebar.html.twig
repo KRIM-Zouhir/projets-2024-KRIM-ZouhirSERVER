@@ -1,0 +1,63 @@
+{# templates/components/sidebar.html.twig #}
+<aside class="sidebar" data-state="expanded">
+    {# Main Navigation #}
+    <div class="sidebar-section">
+        <nav class="sidebar-nav">
+            <a href="{{ path('app_home') }}" class="sidebar-item {% if app.request.get('_route') == 'app_home' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span class="sidebar-text text-white">Home</span>
+            </a>
+            <a href="{{ path('app_community_explore') }}" class="sidebar-item {% if app.request.get('_route') == 'app_community_explore' %}active{% endif %}">
+                <i class="fas fa-compass"></i>
+                <span class="sidebar-text text-white">Explore</span>
+            </a>
+        </nav>
+    </div>
+
+    {# User Communities Section #}
+    {% if app.user %}
+        <div class="sidebar-section">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">Your Communities</h3>
+                <a href="{{ path('app_community_explore') }}" class="sidebar-action" title="Join New Community">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+            
+            <div class="communities-list">
+                {% if app.user.joinedCommunities|length > 0 %}
+                    {% for community in app.user.joinedCommunities %}
+                        <a href="{{ path('app_community_show', {id: community.id}) }}" 
+                           class="community-item {% if app.request.get('id') == community.id %}active{% endif %}"
+                           title="{{ community.name }}">
+                            {% if community.avatar %}
+                                <img src="{{ asset('uploads/community/avatars/' ~ community.avatar) }}" 
+                                     alt="{{ community.name }}" 
+                                     class="community-avatar"
+                                     loading="lazy">
+                            {% else %}
+                                <div class="community-avatar-placeholder">
+                                    {{ community.name|slice(0, 1)|upper }}
+                                </div>
+                            {% endif %}
+                            <span class="community-name text-white">{{ community.name }}</span>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-communities">
+                        <p>No communities joined yet</p>
+                        <a href="{{ path('app_community_explore') }}" class="btn-explore">
+                            Find Communities
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</aside>
+
+{# Add divider and toggle button outside sidebar #}
+<div class="sidebar-divider"></div>
+<button class="sidebar-toggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-chevron-left"></i>
+</button>

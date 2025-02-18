@@ -1,0 +1,153 @@
+{# templates/admin/discussions.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Discussion Management - Moderator Dashboard{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Discussion Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_moderator_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Discussions</li>
+            </ol>
+        </nav>
+    </div>
+
+    {# Search and Filter Section #}
+    <div class="content-section">
+        <form class="row g-3" method="get">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search discussions..." 
+                       value="{{ app.request.query.get('search') }}">
+            </div>
+            <div class="col-md-3">
+                <select name="community" class="form-select">
+                    <option value="">All Communities</option>
+                    {% for community in communities %}
+                        <option value="{{ community.id }}" 
+                                {% if app.request.query.get('community') == community.id %}selected{% endif %}>
+                            {{ community.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="sort" class="form-select">
+                    <option value="newest" {% if app.request.query.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if app.request.query.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="replies" {% if app.request.query.get('sort') == 'replies' %}selected{% endif %}>Most Replies</option>
+                    <option value="views" {% if app.request.query.get('sort') == 'views' %}selected{% endif %}>Most Views</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    {# Discussions Table #}
+    <div class="content-section">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Community</th>
+                        <th>Author</th>
+                        <th>Replies</th>
+                        <th>Views</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for discussion in discussions %}
+                        <tr>
+                            <td>
+                                <div class="discussion-info">
+                                    <span class="discussion-title">{{ discussion.title }}</span>
+                                    <small class="discussion-preview">{{ discussion.content|striptags|slice(0, 50) }}...</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="community-info">
+                                    <img src="{{ asset(discussion.community.image ?? 'images/default-community.png') }}" 
+                                         alt="{{ discussion.community.name }}" 
+                                         class="community-avatar">
+                                    <span>{{ discussion.community.name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <img src="{{ asset(discussion.author.profilePicture ?? 'images/default-avatar.png') }}" 
+                                         alt="{{ discussion.author.username }}'s avatar" 
+                                         class="user-avatar">
+                                    <span>{{ discussion.author.username }}</span>
+                                </div>
+                            </td>
+                            <td>{{ discussion.replies|length }}</td>
+                            <td>{{ discussion.views }}</td>
+                            <td>{{ discussion.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_discussion_show', {'id': discussion.id}) }}" 
+                                       class="btn btn-sm btn-info">View</a>
+                                    {% if discussion.isLocked %}
+                                        <button type="button" 
+                                                class="btn btn-sm btn-success"
+                                                onclick="toggleDiscussionLock({{ discussion.id }}, false)">
+                                            Unlock
+                                        </button>
+                                    {% else %}
+                                        <button type="button" 
+                                                class="btn btn-sm btn-warning"
+                                                onclick="toggleDiscussionLock({{ discussion.id }}, true)">
+                                            Lock
+                                        </button>
+                                    {% endif %}
+                                    <form action="{{ path('app_moderator_discussion_delete', {'id': discussion.id}) }}" 
+                                          method="post" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this discussion? This action cannot be undone.')">
+                                        <button type="submit" class="btn btn-sm btn-danger ms-1">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <h4>No Discussions Found</h4>
+                                    <p class="text-muted">There are no discussions matching your criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if discussions.haveToPaginate is defined and discussions.haveToPaginate %}
+            <div class="pagination justify-content-center mt-4">
+                {{ knp_pagination_render(discussions) }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin/discussions.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/admin/discussions.js') }}"></script>
+{% endblock %}
