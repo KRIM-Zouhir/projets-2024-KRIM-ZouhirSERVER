@@ -1,0 +1,68 @@
+# Guide d'Administration - Forum TalkSphere
+
+## Configuration initiale
+
+### Prérequis
+- PHP 8.1 ou supérieur
+- Composer
+- Symfony CLI
+- MySQL/MariaDB
+
+### Installation
+
+1. Cloner le projet :
+```bash
+git clone [URL_DU_PROJET]
+cd [NOM_DU_PROJET]
+```
+
+2. Installer les dépendances :
+```bash
+composer install
+```
+
+3. Configurer la base de données dans `.env` :
+```
+DATABASE_URL="mysql://[USER]:[PASSWORD]@127.0.0.1:3306/[NOM_DB]"
+```
+
+## Création d'un compte administrateur
+
+1. Créer la base de données :
+```bash
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+```
+
+2. Lancer la commande de création d'admin :
+```bash
+php bin/console app:create-admin
+```
+
+Suivez les instructions pour définir :
+- Email administrateur
+- Mot de passe
+- Pseudo
+
+## Gestion du Forum (Panel Administrateur)
+### Accès au panel
+1. inscrivez-vous avec un compte utilisateur à l'URL : `http://zouhir-krim.insset.ovh/register`
+2. vous recevez un lien de confirmation pour confirmer le l'email
+3. si oui, vous accedez directement vers votre compte utilisateur
+
+### Accès au panel
+1. Connectez-vous à l'URL : `http://zouhir-krim.insset.ovh/login`
+2. Utilisez les identifiants administrateur créés précédemment
+
+### Fonctionnalités administrateur
+
+#### Gestion des discussions
+- Modération : Possibilité de supprimer ou modifier chaque message
+- Suppression : Confirmation en deux étapes requise
+- Modification : Éditeur disponible avec le contenu pré-rempli
+
+## Notes importantes
+- La suppression est irréversible
+- Maximum 5 thèmes par page
+- Maximum 10 discussions par page
+- Les messages peuvent contenir jusqu'à 5000 caractères
